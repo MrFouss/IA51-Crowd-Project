@@ -5,3 +5,10 @@
 .classpath
 .project
 .settings/*
+
+####################
+# Class generation #
+####################
+
+target/*
+src/main/generated-sources/*
