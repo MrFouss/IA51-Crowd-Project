@@ -73,12 +73,43 @@ class Vector2f extends Tuple2f<Vector2f> {
 	def angle(v : Vector2f) : float {
 		return (this.dotProduct(v) / (this.norm * v.norm)).acos as float
 	}
-	 
+
 	def operator_plus(v1 : Vector2f, v2 : Vector2f) : Vector2f {
 		return new Vector2f(v1.x + v2.x, v1.y + v2.y)
 	}
 
 	def operator_minus(v1 : Vector2f, v2 : Vector2f) : Vector2f {
 		return new Vector2f(v1.x - v2.x, v1.y - v2.y)
+	}
+	/** 
+	 * Check if a vector exists or is null
+	 * 
+	 * @param v vector to check
+	 * @return <code>true</code> if a vector is null or with null coordinates
+	 */
+	def isNull : boolean {
+		return (this === null) || (this.x == 0 && this.y == 0)
+	}
+	
+	/** 
+	 * Used to normalize a vector
+	 * 
+	 * @param v vector to normalize
+	 * @return a normalized vector of the given one
+	 */
+	def normalize : Vector2f {
+		var n = this.norm
+		return new Vector2f(this.x / n, this.y / n)
+	}
+	/** 
+	 * Used to rotate a vector 
+	 * 
+	 * @param v vector to rotate
+	 * @param angle rotation angle
+	 * @return a rotated vector according to a given angle
+	 */
+	def rotate(angle : float) : Vector2f {
+		return new Vector2f(this.x * (angle.cos as float) - this.y * (angle.sin as float),
+							this.x * (angle.sin as float) + this.y * (angle.cos as float))
 	}
 }
