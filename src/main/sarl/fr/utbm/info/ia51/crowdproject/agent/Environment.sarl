@@ -27,6 +27,9 @@ import io.sarl.core.Destroy
 import io.sarl.core.Initialize
 import io.sarl.core.Logging
 
+/**
+ * The environment agent, managing all the other agents
+ */
 agent Environment  {
 	
 	uses Logging

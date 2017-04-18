@@ -21,11 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.ui
+package fr.utbm.info.ia51.crowdproject.environment
+
+import fr.utbm.info.ia51.crowdproject.util.math.Point2f
+import fr.utbm.info.ia51.crowdproject.util.math.Shape2f
 
 /**
- * Main class for the GUI of the IA51 Crowd Project
+ * Abstract implementation of an environment object
  */
-class CrowdProjectGUI {
-
+abstract class EnvironmentObject {
+	
+	val position : Point2f
+	val shape : Shape2f<?>
+	
+	/**
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param shape the shape of the object
+	 */
+	new(x : float, y : float, shape : Shape2f<?>) {
+		this.position = new Point2f(x, y)
+		this.shape = shape.clone
+	}
+	/** 
+	 * @param position the spatial position of the object
+	 * @param shape the shape of the object
+	 */
+	new(position : Point2f, shape : Shape2f<?>) {
+		this.position = position.clone
+		this.shape = shape.clone
+	}
 }

@@ -21,11 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.ui
+package fr.utbm.info.ia51.crowdproject.^agent
+
+import io.sarl.core.Initialize
+import io.sarl.core.Logging
+import io.sarl.core.Destroy
 
 /**
- * Main class for the GUI of the IA51 Crowd Project
+ * The hamster agent
  */
-class CrowdProjectGUI {
+agent Hamster extends Animat {
+	uses Logging
+	
+	on Initialize {
+		info("New hamster spawned.")
+	}
 
+	on Destroy {
+		info("A hamster has been killed")
+	}
 }

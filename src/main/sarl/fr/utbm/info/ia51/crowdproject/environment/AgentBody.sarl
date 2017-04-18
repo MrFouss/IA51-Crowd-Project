@@ -21,11 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.ui
+package fr.utbm.info.ia51.crowdproject.environment
 
-/**
- * Main class for the GUI of the IA51 Crowd Project
- */
-class CrowdProjectGUI {
-
+class AgentBody extends EnvironmentObject {
 }
