@@ -66,6 +66,24 @@ class Rectangle2f extends Shape2f<Rectangle2f> {
 		this.bottomRight.y = if(ay > by) ax else bx
 	}
 
+	/**
+	 * Getter of the top left point
+	 * 
+	 * @return the top left point
+	 */
+	def getTopLeft : Point2f {
+		return this.topLeft
+	}
+	
+	/** 
+	 * Getter of the bottom right point
+	 * 
+	 * @return the bottom right point
+	 */
+	def getBottomRight : Point2f {
+		return this.bottomRight
+	}
+
 	override intersects(s : Shape2f<?>) : boolean {
 		if (s instanceof Rectangle2f) {
 			return (MathUtil::intersects(this.topLeft.x, this.bottomRight.x, s.topLeft.x, s.bottomRight.x)
