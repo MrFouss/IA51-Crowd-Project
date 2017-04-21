@@ -46,6 +46,27 @@ class Point2f extends Tuple2f<Point2f> {
 	}
 	
 	/**
+	 * Used to set a point from two coordinates
+	 * 
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 */
+	def set(x : float, y : float) {
+		this.x = x
+		this.y = y
+	}
+	
+	/** 
+	 * Used to set a point from another
+	 * 
+	 * @param p Coordinate point
+	 */
+	def set(p : Point2f) {
+		this.x = p.x
+		this.y = p.y
+	}
+	
+	/**
 	 * Computes the distance between this point and the point p
 	 * 
 	 * @param p the other point
