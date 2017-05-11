@@ -21,32 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.environment
+package fr.utbm.info.ia51.crowdproject.^agent
 
-import java.util.UUID
-import org.dyn4j.geometry.Shape
+import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import java.util.Map
+import java.util.List
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentObject
 import org.dyn4j.geometry.Vector2
+import java.util.UUID
 
-abstract class AgentBody extends EnvironmentObject implements Comparable<AgentBody> {
-
-	val agentId : UUID
-
-	new (x : int, y : int, shape : Shape, agentId : UUID) {
-		super(x, y, shape)
-		this.agentId = agentId
-	}
-
-	new (position : Vector2, shape : Shape, agentId : UUID) {
-		super(position, shape)
-		this.agentId = agentId
-	}
+/** 
+ * 
+ */
+capacity EnvironmentManager {
+	/** 
+	 * Apply the list of actions
+	 */
+	def applyActions(actions : List<MotionQuery>)
 	
-	def compareTo(o : AgentBody) : int {
-		if (o === this) {
-			return 0
-		} else if (o === null) {
-			return Integer::MAX_VALUE
-		}
-		return this.agentId.compareTo(o.agentId)
-	}
+	/** 
+	 * Replies the perceptions of each agent
+	 */
+	def getPerceptions : Map<AgentBody, List<EnvironmentObject>>
+}
+
+capacity EnvironmentFrontEnd {
+
+	/**
+	 * 
+	 */
+	def sendPerception(
+		time : int,
+		bodyID : UUID,
+		objects : List<EnvironmentObject>,
+		position : Vector2)
+}
+
+capacity EnvironmentMotion {
+	
+	/**
+	 * 
+	 */
+	def move(direction : Vector2)
 }

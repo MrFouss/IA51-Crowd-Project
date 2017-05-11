@@ -21,32 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.environment
+package fr.utbm.info.ia51.crowdproject.^agent
 
-import java.util.UUID
-import org.dyn4j.geometry.Shape
 import org.dyn4j.geometry.Vector2
+import java.util.UUID
 
-abstract class AgentBody extends EnvironmentObject implements Comparable<AgentBody> {
+/** 
+ * 
+ */
+package final class MotionQuery {
+	val emitter : UUID
 
-	val agentId : UUID
+	val accelerationVector : Vector2
 
-	new (x : int, y : int, shape : Shape, agentId : UUID) {
-		super(x, y, shape)
-		this.agentId = agentId
-	}
-
-	new (position : Vector2, shape : Shape, agentId : UUID) {
-		super(position, shape)
-		this.agentId = agentId
+	new (emitter : UUID, accelerationVector : Vector2) {
+		this.emitter = emitter
+		this.accelerationVector = accelerationVector
 	}
 	
-	def compareTo(o : AgentBody) : int {
-		if (o === this) {
-			return 0
-		} else if (o === null) {
-			return Integer::MAX_VALUE
-		}
-		return this.agentId.compareTo(o.agentId)
+	/** 
+	 * Replies the emitter of the query
+	 */
+	def getEmitter : UUID {
+		this.emitter
+	}
+	
+	/** 
+	 * Replies the acceleration vector
+	 */
+	def getMotionVector : Vector2 {
+		this.accelerationVector
 	}
 }
