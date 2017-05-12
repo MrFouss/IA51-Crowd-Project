@@ -21,54 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.^agent
-
-import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import java.util.Map
-import java.util.List
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentObject
-import org.dyn4j.geometry.Vector2
-import java.util.UUID
-import fr.utbm.info.ia51.crowdproject.environment.MovableEnvironmentObject
+package fr.utbm.info.ia51.crowdproject.environment
 
 /** 
- * Capacity to manage the environment
+ * Abstract class that defines an environment object able to move or to be moved
  */
-capacity EnvironmentManager {
-	
-	/** 
-	 * Apply the list of actions
-	 */
-	def applyActions(actions : List<MotionQuery>)
-	
-	/** 
-	 * Replies the perceptions of each agent
-	 */
-	def getPerceptions : Map<AgentBody, List<EnvironmentObject>>
-}
-
-/**
- * Capacity to act as the front end of the environment
- */
-capacity EnvironmentFrontEnd {
-
-	/**
-	 * Sends a perception signal to an agent
-	 */
-	def sendPerception(
-		time : int,
-		bodyID : UUID,
-		objects : List<EnvironmentObject>,
-		position : Vector2)
-}
-
-/**
- * Capacity to move in the environment
- */
-capacity EnvironmentMotion {
-	
-	/**
-	 * Moves an object in a direction
-	 */
-	def move(object : MovableEnvironmentObject, direction : Vector2)
-}
+abstract class MovableEnvironmentObject extends EnvironmentObject {}
