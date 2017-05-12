@@ -62,13 +62,17 @@
 		<dependency>
 			<groupId>io.janusproject</groupId>
 			<artifactId>io.janusproject.kernel</artifactId>
-			<version>2.0.5.5</version>
-			<!-- <exclusions>
-				<exclusion>
-					<groupId>org.eclipse.xtext</groupId>
-					<artifactId>org.eclipse.xtext.xbase.lib</artifactId>
-				</exclusion>
-			</exclusions> -->
+			<version>2.0.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.sarl</groupId>
+			<artifactId>io.sarl.core</artifactId>
+			<version>0.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>io.sarl</groupId>
+			<artifactId>io.sarl.util</artifactId>
+			<version>0.5.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.xtext</groupId>
