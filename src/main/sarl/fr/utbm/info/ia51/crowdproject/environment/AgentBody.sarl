@@ -27,7 +27,7 @@ import java.util.UUID
 import org.dyn4j.geometry.Shape
 import org.dyn4j.geometry.Vector2
 
-abstract class AgentBody extends MovableEnvironmentObject implements Comparable<AgentBody> {
+abstract class AgentBody extends MobileObject implements Comparable<AgentBody> {
 
 	val agentId : UUID
 

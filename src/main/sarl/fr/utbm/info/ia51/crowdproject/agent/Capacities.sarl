@@ -29,7 +29,7 @@ import java.util.List
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentObject
 import org.dyn4j.geometry.Vector2
 import java.util.UUID
-import fr.utbm.info.ia51.crowdproject.environment.MovableEnvironmentObject
+import fr.utbm.info.ia51.crowdproject.environment.MobileObject
 
 /** 
  * Capacity to manage the environment
@@ -70,5 +70,5 @@ capacity EnvironmentMotion {
 	/**
 	 * Moves an object in a direction
 	 */
-	def move(object : MovableEnvironmentObject, direction : Vector2)
+	def move(object : MobileObject, direction : Vector2)
 }
