@@ -26,10 +26,10 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import java.util.Map
 import java.util.List
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentObject
 import org.dyn4j.geometry.Vector2
 import java.util.UUID
-import fr.utbm.info.ia51.crowdproject.environment.MobileObject
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 
 /** 
  * Capacity to manage the environment
@@ -38,13 +38,43 @@ capacity EnvironmentManager {
 	
 	/** 
 	 * Apply the list of actions
+	 * 
+	 * @param actions the list of actions to apply
 	 */
 	def applyActions(actions : List<MotionQuery>)
 	
 	/** 
-	 * Replies the perceptions of each agent
+	 * Checks if the target has been reached for all agents
+	 * 
+	 * @param agentBodies the list of all agent bodies
+	 * @param targetPosition current position of the target
+	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
-	def getPerceptions : Map<AgentBody, List<EnvironmentObject>>
+	def isTargetReached(agentBodies : List<AgentBody>, targetPosition : Vector2) : boolean
+	
+	/** 
+	 * Replies the overall perceptions of each agent
+	 * 
+	 * @param agentBodies the list of all agent bodies
+	 * @return the list of perceptions for each agent's body
+	 */
+	def getPerceptions(agentBodies : List<AgentBody>) : Map<AgentBody, List<EnvironmentBody>>
+	
+	/** 
+	 * Replies the visual perceptions of the agent
+	 * 
+	 * @param agentBody the body that perceives its environment
+	 * @return the list of visual perceptions for the agent's body
+	 */
+	def getVisualPerceptions(agentBody : AgentBody) : List<EnvironmentBody>
+	
+	/** 
+	 * Replies the auditory perceptions of the agent
+	 * 
+	 * @param agentBody the body that perceives its environment
+	 * @return the list of auditory perceptions for the agent's body
+	 */
+	def getAuditoryPerceptions(agentBody : AgentBody) : List<EnvironmentBody>
 }
 
 /**
@@ -54,12 +84,15 @@ capacity EnvironmentFrontEnd {
 
 	/**
 	 * Sends a perception signal to an agent
+	 * 
+	 * @param agentId the identifier of the agent
+	 * @param objects the list of objects perceived by the agent
+	 * @param position the current position of the agent's body
 	 */
 	def sendPerception(
-		time : int,
-		bodyID : UUID,
-		objects : List<EnvironmentObject>,
-		position : Vector2)
+			agentId : UUID,
+			objects : List<EnvironmentBody>,
+			position : Vector2)
 }
 
 /**
@@ -69,6 +102,9 @@ capacity EnvironmentMotion {
 	
 	/**
 	 * Moves an object in a direction
+	 * 
+	 * @param object the object to move
+	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
 	 */
-	def move(object : MobileObject, direction : Vector2)
+	def move(object : MobileBody, direction : Vector2)
 }
