@@ -26,19 +26,72 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import io.sarl.core.Destroy
 import io.sarl.core.Initialize
 import io.sarl.core.Logging
+import java.util.LinkedList
+import io.sarl.core.DefaultContextInteractions
+import io.sarl.util.Scopes
+import io.sarl.core.Lifecycle
+import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import java.util.List
+import org.dyn4j.geometry.Vector2
 
 /**
  * The environment agent, managing all the other agents
  */
-agent Environment  {
+agent Environment {
 	
-	uses Logging
+	uses Logging, Lifecycle, DefaultContextInteractions, DefaultEnvironmentManager, DefaultEnvironmentFrontEnd
+
+	val agentBodies : List<AgentBody> = new LinkedList
+	val actions = new LinkedList<MotionQuery>
+	var targetPosition : Vector2
 
 	on Initialize {
 		info("Beginning of the simulation. Spawning the environment agent.")
+		targetPosition = new Vector2(0.0f, 0.0f) // TODO
 	}
 
 	on Destroy {
 		info("End of the simulation. Killing the environment agent.")
+	}
+
+	on RunBeginningOfStep {
+		synchronized (this) {
+			this.actions.clear
+
+			for (e : getPerceptions(agentBodies).entrySet) {
+				sendPerception(e.key.agentId, e.value, e.key.position)
+			}
+		}
+	}
+	
+	on Action {
+		synchronized (this) {
+			this.actions += new MotionQuery(occurrence.source.UUID, occurrence.direction)
+			
+			if (this.actions.size >= this.agentBodies.size - 1) {
+				emit(new RunEndOfStep, Scopes.addresses(defaultAddress))
+			}
+		}
+	}
+
+	on RunEndOfStep {
+		synchronized (this) {
+			// Eventually take into account the actions of the player
+			// actions += ...
+			
+			// Change the state of the universe
+			applyActions(this.actions)
+
+			if (isTargetReached(agentBodies, targetPosition)) {
+				// do something to notify that all hamsters reached the target
+				// TODO
+				killMe
+			}
+			
+			// TODO increase time
+
+			// Move to next step
+			emit(new RunBeginningOfStep)
+		}
 	}
 }

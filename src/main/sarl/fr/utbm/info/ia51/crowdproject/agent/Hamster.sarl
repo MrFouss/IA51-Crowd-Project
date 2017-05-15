@@ -31,6 +31,7 @@ import io.sarl.core.Destroy
  * The hamster agent
  */
 agent Hamster extends Animat {
+	
 	uses Logging
 	
 	on Initialize {
