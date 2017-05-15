@@ -27,11 +27,11 @@ import org.dyn4j.geometry.Vector2
 import java.util.UUID
 
 /** 
- * 
+ * Message sent from an agent to the environment, asking to move in a direction
  */
 package final class MotionQuery {
+	
 	val emitter : UUID
-
 	val accelerationVector : Vector2
 
 	new (emitter : UUID, accelerationVector : Vector2) {
