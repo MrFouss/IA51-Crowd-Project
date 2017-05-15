@@ -23,32 +23,44 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
+import org.dyn4j.dynamics.Body
+import java.awt.Color
+import org.dyn4j.geometry.Convex
+import org.dyn4j.geometry.MassType
 import org.dyn4j.geometry.Vector2
-import org.dyn4j.geometry.Shape
 
 /**
- * Abstract implementation of an environment object
+ * Abstract implementation of an environment body
  */
-abstract class EnvironmentObject {
+abstract class EnvironmentBody extends Body {
 	
-	val position : Vector2
-	val shape : Shape
+	val color : Color
 	
 	/**
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @param shape the shape of the object
+	 * @param shape a shape that has to be convex
+	 * @param mass the type of the mass (MassType.NORMAL or MassType.INFINITE)
 	 */
-	new(x : float, y : float, shape : Shape) {
-		this.position = new Vector2(x, y)
-		this.shape = shape
+	new(shape : Convex, mass : MassType) {
+		this.addFixture(shape)
+		this.setMass(mass)
+		this.color = new Color(
+			(Math.random * 0.5f + 0.5f) as float,
+			(Math.random * 0.5f + 0.5f) as float,
+			(Math.random * 0.5f + 0.5f) as float)
 	}
+	
 	/** 
-	 * @param position the spatial position of the object
-	 * @param shape the shape of the object
+	 * @param shape a shape that has to be convex
+	 * @param mass the type of the mass (MassType.NORMAL or MassType.INFINITE)
+	 * @param color the color of the object
 	 */
-	new(position : Vector2, shape : Shape) {
-		this.position = position
-		this.shape = shape
+	new(shape : Convex, mass : MassType, color : Color) {
+		this.addFixture(shape)
+		this.setMass(mass)
+		this.color = color
+	}
+	
+	def getPosition : Vector2 {
+		return this.worldCenter
 	}
 }
