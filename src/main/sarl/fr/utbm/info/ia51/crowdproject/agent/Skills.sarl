@@ -25,58 +25,136 @@ package fr.utbm.info.ia51.crowdproject.^agent
 
 import java.util.List
 import java.util.Map
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentObject
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
-import fr.utbm.info.ia51.crowdproject.environment.MobileObject
+import java.util.TreeMap
+import org.dyn4j.dynamics.World
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import java.util.LinkedList
+import fr.utbm.info.ia51.crowdproject.Launcher
+import fr.utbm.info.ia51.crowdproject.environment.MotionBehavior
 
 /** 
  * Default implementation of the EnvironmentManager capacity
  */
-skill DefaultEnvironmentManagerSkill implements EnvironmentManager {
+skill DefaultEnvironmentManager implements EnvironmentManager {
+
+	var world : World
+
+	new () {
+		this.world = new World()
+	}
 	
 	/** 
 	 * Apply the list of actions
+	 * 
+	 * @param actions the list of actions to apply
 	 */
 	def applyActions(actions : List<MotionQuery>) {
-		
+		for (action : actions) {
+			// TODO apply all actions
+		}
 	}
 	
 	/** 
-	 * Replies the perceptions of each agent
+	 * Checks if the target has been reached for all agents
+	 * 
+	 * @param agentBodies the list of all agent bodies
+	 * @param targetPosition current position of the target
+	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
-	def getPerceptions : Map<AgentBody, List<EnvironmentObject>> {
+	def isTargetReached(agentBodies : List<AgentBody>, targetPosition : Vector2) : boolean {
+		for (body : agentBodies) {
+			if (body.position.to(targetPosition).magnitude > Launcher::TARGET_OFFSET) {
+				return false
+			}
+		}
+		return true
+	}
+	
+	/** 
+	 * Replies the overall perceptions of each agent
+	 * 
+	 * @param agentBodies the list of all agent bodies
+	 * @return the list of perceptions for each agent's body
+	 */
+	def getPerceptions(agentBodies : List<AgentBody>) : Map<AgentBody, List<EnvironmentBody>> {
+		var perceptions = new TreeMap<AgentBody, List<EnvironmentBody>>
+		for (agentBody : agentBodies) {
+			val perceivedObjects = new LinkedList<EnvironmentBody>
+			perceivedObjects += getVisualPerceptions(agentBody) + getAuditoryPerceptions(agentBody)
+			perceptions.put(agentBody, perceivedObjects)
+		}
+		return perceptions
+	}
+	
+	/** 
+	 * Replies the visual perceptions of the agent
+	 * 
+	 * @param agentBody the body that perceives its environment
+	 * @return the list of visual perceptions for the agent's body
+	 */
+	def getVisualPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
+		val perceivedObjects = new LinkedList<EnvironmentBody>
+
+		// TODO compute visual perceptions for the body
 		
+		return perceivedObjects
+	}
+	
+	/** 
+	 * Replies the auditory perceptions of the agent
+	 * 
+	 * @param agentBody the body that perceives its environment
+	 * @return the list of auditory perceptions for the agent's body
+	 */
+	def getAuditoryPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
+		val perceivedObjects = new LinkedList<EnvironmentBody>
+
+		// TODO compute auditory perceptions for the body
+		
+		return perceivedObjects
 	}
 }
-
 /** 
  * Default implementation of the EnvironmentFrontEnd capacity
  */
-skill DefaultEnvironmentFrontEndSkill implements EnvironmentFrontEnd {
+skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
 	
 	/** 
 	 * Sends a perception signal to an agent
+	 * 
+	 * @param agentId the identifier of the agent
+	 * @param objects the list of objects perceived by the agent
+	 * @param position the current position of the agent's body
 	 */
-	def sendPerception(
-		time : int,
-		bodyID : UUID,
-		objects : List<EnvironmentObject>,
-		position : Vector2) {
+	def sendPerception(agentId : UUID,
+			objects : List<EnvironmentBody>,
+			position : Vector2) {
 			
-		}
+		// TODO send perceptions to each agent
+	}
 }
 
 /** 
  * Default implementation of the EnvironmentMotion capacity
  */
-skill DefaultEnvironmentMotionSkill implements EnvironmentMotion {
+skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	
 	/** 
 	 * Moves an object in a direction
+	 * 
+	 * @param object the object to move
+	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
 	 */
-	def move(object : MobileObject, direction : Vector2) {
-		
+	def move(object : MobileBody, direction : Vector2) {
+		// TODO add motion algorithm, move the object according to the direction vector
+		if (Launcher::MOTION_BEHAVIOR === MotionBehavior::KINEMATIC) {
+			// TODO
+		} else if (Launcher::MOTION_BEHAVIOR === MotionBehavior::STEERING) {
+			// TODO
+		}
 	}
 }
