@@ -24,21 +24,26 @@
 package fr.utbm.info.ia51.crowdproject.environment
 
 import java.util.UUID
-import org.dyn4j.geometry.Shape
+import org.dyn4j.geometry.Convex
+import org.dyn4j.geometry.MassType
 import org.dyn4j.geometry.Vector2
 
-abstract class AgentBody extends MobileObject implements Comparable<AgentBody> {
+abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	val agentId : UUID
 
-	new (x : int, y : int, shape : Shape, agentId : UUID) {
-		super(x, y, shape)
+	new (shape : Convex, agentId : UUID) {
+		super(shape, MassType.NORMAL)
 		this.agentId = agentId
 	}
 
-	new (position : Vector2, shape : Shape, agentId : UUID) {
-		super(position, shape)
+	new (position : Vector2, shape : Convex, agentId : UUID) {
+		super(shape, MassType.NORMAL)
 		this.agentId = agentId
+	}
+	
+	def getAgentId : UUID {
+		return this.agentId
 	}
 	
 	def compareTo(o : AgentBody) : int {
