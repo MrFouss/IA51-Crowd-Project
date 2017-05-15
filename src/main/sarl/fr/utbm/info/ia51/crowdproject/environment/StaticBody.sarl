@@ -24,6 +24,6 @@
 package fr.utbm.info.ia51.crowdproject.environment
 
 /** 
- * Abstract class that defines an environment object able to move or to be moved
+ * 
  */
-abstract class MobileObject extends EnvironmentObject {}
+class StaticBody extends EnvironmentBody {}
