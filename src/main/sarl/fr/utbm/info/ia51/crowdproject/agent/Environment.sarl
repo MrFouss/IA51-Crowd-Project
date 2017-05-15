@@ -43,6 +43,7 @@ agent Environment {
 
 	val agentBodies : List<AgentBody> = new LinkedList
 	val actions = new LinkedList<MotionQuery>
+	var time = 0 as long
 	var targetPosition : Vector2
 
 	on Initialize {
@@ -59,12 +60,12 @@ agent Environment {
 			this.actions.clear
 
 			for (e : getPerceptions(agentBodies).entrySet) {
-				sendPerception(e.key.agentId, e.value, e.key.position)
+				sendPerception(e.key.agentId, e.value, e.key.position, this.time)
 			}
 		}
 	}
 	
-	on Action {
+	on Action [occurrence.time >= this.time] {
 		synchronized (this) {
 			this.actions += new MotionQuery(occurrence.source.UUID, occurrence.direction)
 			
@@ -88,7 +89,8 @@ agent Environment {
 				killMe
 			}
 			
-			// TODO increase time
+			// Increase time value
+			time++
 
 			// Move to next step
 			emit(new RunBeginningOfStep)

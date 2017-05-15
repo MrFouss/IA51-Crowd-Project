@@ -88,11 +88,13 @@ capacity EnvironmentFrontEnd {
 	 * @param agentId the identifier of the agent
 	 * @param objects the list of objects perceived by the agent
 	 * @param position the current position of the agent's body
+	 * @param time value of the time during the step
 	 */
 	def sendPerception(
 			agentId : UUID,
 			objects : List<EnvironmentBody>,
-			position : Vector2)
+			position : Vector2,
+			time : long)
 }
 
 /**
