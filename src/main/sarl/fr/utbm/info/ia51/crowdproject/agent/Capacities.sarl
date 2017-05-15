@@ -27,14 +27,22 @@ import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import java.util.Map
 import java.util.List
 import org.dyn4j.geometry.Vector2
-import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
 
 /** 
  * Capacity to manage the environment
  */
 capacity EnvironmentManager {
+	
+	/** 
+	 * Creates a hamster's body in the world
+	 * 
+	 * @param perceptionDistance the distance of perception of the hamster
+	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
+	 */
+	def createHamster(perceptionDistance : int, isDeaf : boolean) : HamsterBody
 	
 	/** 
 	 * Apply the list of actions
@@ -78,26 +86,6 @@ capacity EnvironmentManager {
 }
 
 /**
- * Capacity to act as the front end of the environment
- */
-capacity EnvironmentFrontEnd {
-
-	/**
-	 * Sends a perception signal to an agent
-	 * 
-	 * @param agentId the identifier of the agent
-	 * @param objects the list of objects perceived by the agent
-	 * @param position the current position of the agent's body
-	 * @param time value of the time during the step
-	 */
-	def sendPerception(
-			agentId : UUID,
-			objects : List<EnvironmentBody>,
-			position : Vector2,
-			time : long)
-}
-
-/**
  * Capacity to move in the environment
  */
 capacity EnvironmentMotion {
@@ -110,3 +98,7 @@ capacity EnvironmentMotion {
 	 */
 	def move(object : MobileBody, direction : Vector2)
 }
+
+/**
+ * Capacity to perceive the environment
+ */

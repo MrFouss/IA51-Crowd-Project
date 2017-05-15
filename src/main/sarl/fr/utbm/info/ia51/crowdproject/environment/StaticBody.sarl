@@ -26,4 +26,4 @@ package fr.utbm.info.ia51.crowdproject.environment
 /** 
  * 
  */
-class StaticBody extends EnvironmentBody {}
+abstract class StaticBody extends EnvironmentBody {}

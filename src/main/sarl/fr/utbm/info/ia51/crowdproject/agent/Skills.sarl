@@ -26,7 +26,6 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import java.util.List
 import java.util.Map
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import java.util.UUID
 import org.dyn4j.geometry.Vector2
 import java.util.TreeMap
 import org.dyn4j.dynamics.World
@@ -35,6 +34,10 @@ import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import java.util.LinkedList
 import fr.utbm.info.ia51.crowdproject.Launcher
 import fr.utbm.info.ia51.crowdproject.environment.MotionBehavior
+import org.dyn4j.geometry.Geometry
+import java.util.UUID
+import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
+import org.dyn4j.collision.AxisAlignedBounds
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -43,8 +46,24 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 
 	var world : World
 
-	new () {
+	new (width : float, height : float) {
 		this.world = new World()
+		world.setBounds(new AxisAlignedBounds(width, height))
+	}
+	
+	/** 
+	 * Creates a hamster's body in the world
+	 * 
+	 * @param perceptionDistance the distance of perception of the hamster
+	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
+	 */
+	def createHamster(perceptionDistance : int, isDeaf : boolean) : HamsterBody {
+		val body = new HamsterBody(Geometry.createCircle(1.0f),
+			perceptionDistance,
+			isDeaf,
+			UUID::randomUUID)
+		this.world.addBody(body);
+		return body
 	}
 	
 	/** 
@@ -116,27 +135,6 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		// TODO compute auditory perceptions for the body
 		
 		return perceivedObjects
-	}
-}
-/** 
- * Default implementation of the EnvironmentFrontEnd capacity
- */
-skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
-	
-	/** 
-	 * Sends a perception signal to an agent
-	 * 
-	 * @param agentId the identifier of the agent
-	 * @param objects the list of objects perceived by the agent
-	 * @param position the current position of the agent's body
-	 * @param time value of the time during the step
-	 */
-	def sendPerception(agentId : UUID,
-			objects : List<EnvironmentBody>,
-			position : Vector2,
-			time : long) {
-			
-		// TODO send perceptions to each agent
 	}
 }
 
