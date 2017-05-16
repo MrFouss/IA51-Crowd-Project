@@ -34,7 +34,7 @@ import org.dyn4j.geometry.Vector2
  */
 agent Hamster extends Animat {
 	
-	uses Logging, DefaultContextInteractions
+	uses Logging, DefaultContextInteractions, EnvironmentMotion
 	
 	on Initialize {
 		info("New hamster spawned.")

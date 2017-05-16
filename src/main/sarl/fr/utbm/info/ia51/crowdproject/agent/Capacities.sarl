@@ -28,8 +28,9 @@ import java.util.Map
 import java.util.List
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
-import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
+import java.util.UUID
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 
 /** 
  * Capacity to manage the environment
@@ -83,6 +84,14 @@ capacity EnvironmentManager {
 	 * @return the list of auditory perceptions for the agent's body
 	 */
 	def getAuditoryPerceptions(agentBody : AgentBody) : List<EnvironmentBody>
+	
+	/** 
+	 * Moves an object in a direction
+	 * 
+	 * @param object the object to move
+	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
+	 */
+	def moveObject(object : MobileBody, direction : Vector2)
 }
 
 /**
@@ -90,15 +99,11 @@ capacity EnvironmentManager {
  */
 capacity EnvironmentMotion {
 	
-	/**
-	 * Moves an object in a direction
+	/** 
+	 * Sends the environment a message, asking to be moved
 	 * 
-	 * @param object the object to move
+	 * @param agentId identifier of the agent to move
 	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
 	 */
-	def move(object : MobileBody, direction : Vector2)
+	def move(agentId : UUID, direction : Vector2)
 }
-
-/**
- * Capacity to perceive the environment
- */

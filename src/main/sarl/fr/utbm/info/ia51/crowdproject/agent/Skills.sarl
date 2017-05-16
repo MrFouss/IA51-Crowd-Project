@@ -136,6 +136,21 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		
 		return perceivedObjects
 	}
+	
+	/** 
+	 * Moves an object in a direction
+	 * 
+	 * @param object the object to move
+	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
+	 */
+	def moveObject(object : MobileBody, direction : Vector2) {
+		// TODO add motion algorithm, move the object according to the direction vector
+		if (Launcher::MOTION_BEHAVIOR === MotionBehavior::KINEMATIC) {
+			// TODO
+		} else if (Launcher::MOTION_BEHAVIOR === MotionBehavior::STEERING) {
+			// TODO
+		}
+	}
 }
 
 /** 
@@ -144,17 +159,12 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	
 	/** 
-	 * Moves an object in a direction
+	 * Sends the environment a message, asking to be moved
 	 * 
-	 * @param object the object to move
+	 * @param agentId identifier of the agent to move
 	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
 	 */
-	def move(object : MobileBody, direction : Vector2) {
-		// TODO add motion algorithm, move the object according to the direction vector
-		if (Launcher::MOTION_BEHAVIOR === MotionBehavior::KINEMATIC) {
-			// TODO
-		} else if (Launcher::MOTION_BEHAVIOR === MotionBehavior::STEERING) {
-			// TODO
-		}
+	def move(agentId : UUID, direction : Vector2) {
+		// TODO
 	}
 }
