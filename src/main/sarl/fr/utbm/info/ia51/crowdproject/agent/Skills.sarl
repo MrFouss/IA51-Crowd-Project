@@ -57,7 +57,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param perceptionDistance the distance of perception of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(perceptionDistance : int, isDeaf : boolean) : HamsterBody {
+	def createHamster(perceptionDistance : float, isDeaf : boolean) : HamsterBody {
 		val body = new HamsterBody(Geometry.createCircle(1.0f),
 			perceptionDistance,
 			isDeaf,

@@ -31,11 +31,11 @@ import org.dyn4j.geometry.Vector2
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	val agentId : UUID
-	val perceptionDistance : int
+	val perceptionDistance : float
 	val isDeaf : boolean
 
 	new (shape : Convex,
-			perceptionDistance : int,
+			perceptionDistance : float,
 			isDeaf : boolean,
 			agentId : UUID) {
 		super(shape, MassType.NORMAL)
@@ -46,7 +46,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	new (shape : Convex,
 			position : Vector2,
-			perceptionDistance : int,
+			perceptionDistance : float,
 			isDeaf : boolean,
 			agentId : UUID) {
 		super(shape, MassType.NORMAL)

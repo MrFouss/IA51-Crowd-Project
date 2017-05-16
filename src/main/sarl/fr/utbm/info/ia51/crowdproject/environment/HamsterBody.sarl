@@ -32,11 +32,11 @@ import org.dyn4j.geometry.Vector2
  */
 class HamsterBody extends AgentBody {
 
-	new (shape : Convex, perceptionDistance : int, isDeaf : boolean, agentId : UUID) {
+	new (shape : Convex, perceptionDistance : float, isDeaf : boolean, agentId : UUID) {
 		super(shape, perceptionDistance, isDeaf, agentId)
 	}
 
-	new (shape : Convex, position : Vector2, perceptionDistance : int, isDeaf : boolean, agentId : UUID) {
+	new (shape : Convex, position : Vector2, perceptionDistance : float, isDeaf : boolean, agentId : UUID) {
 		super(shape, position, perceptionDistance, isDeaf, agentId)
 	}
 }

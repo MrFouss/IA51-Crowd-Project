@@ -42,7 +42,7 @@ capacity EnvironmentManager {
 	 * @param perceptionDistance the distance of perception of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(perceptionDistance : int, isDeaf : boolean) : HamsterBody
+	def createHamster(perceptionDistance : float, isDeaf : boolean) : HamsterBody
 	
 	/** 
 	 * Apply the list of actions
