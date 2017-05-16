@@ -12,3 +12,9 @@
 
 target/*
 src/main/generated-sources/*
+
+#####################
+# Generated javadoc #
+#####################
+
+src/main/javadoc/*
