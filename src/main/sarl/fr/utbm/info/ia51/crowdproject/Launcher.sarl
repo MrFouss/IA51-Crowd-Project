@@ -24,13 +24,19 @@
 package fr.utbm.info.ia51.crowdproject
 
 import io.janusproject.Boot
-import io.janusproject.util.LoggerCreator
-import java.util.logging.Level
 import fr.utbm.info.ia51.crowdproject.^agent.Environment
-import fr.utbm.info.ia51.crowdproject.ui.CrowdProjectGUI
+//import fr.utbm.info.ia51.crowdproject.ui.CrowdProjectGUI
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import java.net.URL
+import javafx.application.Application
+import javafx.fxml.FXMLLoader
+import javafx.fxml.JavaFXBuilderFactory
+import javafx.scene.Parent
+import javafx.scene.Scene
+import javafx.stage.Stage
+import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 
-class Launcher {
+class Launcher extends Application {
 	
 	public static val WIDTH = 100.0f
 	public static val HEIGHT = 100.0f
@@ -40,20 +46,38 @@ class Launcher {
 	
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
 
-	static def main(args : String[]) : void {
-		Boot::setOffline(true)
-		Boot::setVerboseLevel(LoggerCreator::toInt(Level::INFO))
-		Boot::showJanusLogo
+	private var loader : FXMLLoader
 
-		var ui = new CrowdProjectGUI()
+	@Override
+	public def start(stage : Stage) throws Exception {
+		var location : URL = getClass().getResource("view/FXApplication.fxml");
+		loader = new FXMLLoader();
+		var c : FXMLViewerController = new FXMLViewerController();
+		loader.controller = c;
+		loader.setLocation(location);
+		loader.setBuilderFactory(new JavaFXBuilderFactory());
+		var root : Parent = loader.load(location.openStream()) as Parent;
+		var scene : Scene = new Scene(root);
+		stage.setTitle("Crowd Project");
+		stage.setScene(scene);
+		stage.show();
+	}
 
-		Boot::startJanus(
-				typeof(Environment),
-				WIDTH,
-				HEIGHT,
-				NB_HAMSTERS,
-				PERCEPTION_DISTANCE,
-				MOTION_BEHAVIOR)
+	public static def main(args : String[]) {
+		Boot::startJanus(typeof(Environment),
+						WIDTH, 
+						HEIGHT, 
+						NB_HAMSTERS, 
+						PERCEPTION_DISTANCE, 
+						MOTION_BEHAVIOR)
+		launch(args);
+	}
+
+		
+	@Override
+	public def stop() throws Exception {
+		super.stop();
+		//(loader.getController() as FXMLViewerController).cleanExit();
 	}
 
 }

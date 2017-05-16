@@ -1,0 +1,30 @@
+/** 
+ * 
+ */
+package fr.utbm.info.ia51.crowdproject.ui
+
+import io.sarl.lang.core.EventListener
+import io.sarl.lang.core.Event
+import java.util.UUID
+import fr.utbm.info.ia51.crowdproject.^agent.EnvironmentSituation
+
+/** 
+ * @author krophil
+ * 
+ */
+class FXMLViewerController implements EventListener {
+	
+	private val id : UUID = UUID.randomUUID
+
+	@Override
+	override getID : UUID {
+		return this.id
+	}
+	
+	@Override
+	override receiveEvent(^event : Event) {
+		if (^event instanceof EnvironmentSituation) {
+			// TODO Auto-generated code.
+		}
+	}
+}
