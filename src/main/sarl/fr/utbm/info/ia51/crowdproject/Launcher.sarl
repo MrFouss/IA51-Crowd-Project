@@ -36,7 +36,7 @@ class Launcher {
 	public static val HEIGHT = 100.0f
 	
 	public static val NB_HAMSTERS = 10
-	public static val PERCEPTION_DISTANCE = 15
+	public static val PERCEPTION_DISTANCE = 15.0f
 	
 	public static val TARGET_OFFSET = 1.0f
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
