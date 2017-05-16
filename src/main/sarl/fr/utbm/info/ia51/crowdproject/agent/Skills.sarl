@@ -32,12 +32,14 @@ import org.dyn4j.dynamics.World
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import java.util.LinkedList
-import fr.utbm.info.ia51.crowdproject.Launcher
-import fr.utbm.info.ia51.crowdproject.environment.MotionBehavior
 import org.dyn4j.geometry.Geometry
 import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
 import org.dyn4j.collision.AxisAlignedBounds
+import io.sarl.core.DefaultContextInteractions
+import io.sarl.lang.core.Address
+import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import java.util.Collection
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -70,9 +72,12 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * Apply the list of actions
 	 * 
 	 * @param actions the list of actions to apply
+	 * @param agentBodies the list of agent bodies
 	 */
-	def applyActions(actions : List<MotionQuery>) {
+	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
+			var agentBody = agentBodies.get(action.emitter)
+			
 			// TODO apply all actions
 		}
 	}
@@ -84,11 +89,9 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param targetPosition current position of the target
 	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
-	def isTargetReached(agentBodies : List<AgentBody>, targetPosition : Vector2) : boolean {
+	def isTargetReached(agentBodies : Collection<AgentBody>, targetPosition : Vector2) : boolean {
 		for (body : agentBodies) {
-			if (body.position.to(targetPosition).magnitude > Launcher::TARGET_OFFSET) {
-				return false
-			}
+			// TODO if any agent's body isn't within a certain range of the target, return false
 		}
 		return true
 	}
@@ -99,7 +102,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param agentBodies the list of all agent bodies
 	 * @return the list of perceptions for each agent's body
 	 */
-	def getPerceptions(agentBodies : List<AgentBody>) : Map<AgentBody, List<EnvironmentBody>> {
+	def getPerceptions(agentBodies : Collection<AgentBody>) : Map<AgentBody, List<EnvironmentBody>> {
 		var perceptions = new TreeMap<AgentBody, List<EnvironmentBody>>
 		for (agentBody : agentBodies) {
 			val perceivedObjects = new LinkedList<EnvironmentBody>
@@ -141,15 +144,28 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * Moves an object in a direction
 	 * 
 	 * @param object the object to move
-	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
+	 * @param motion data about the path the path to follow
 	 */
-	def moveObject(object : MobileBody, direction : Vector2) {
-		// TODO add motion algorithm, move the object according to the direction vector
-		if (Launcher::MOTION_BEHAVIOR === MotionBehavior::KINEMATIC) {
-			// TODO
-		} else if (Launcher::MOTION_BEHAVIOR === MotionBehavior::STEERING) {
-			// TODO
-		}
+	def moveObject(object : MobileBody, motion : MotionQuery) {
+		// TODO
+	}
+}
+
+skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
+	
+	uses DefaultContextInteractions
+	
+	/**
+	 * Sends a list of perceived objects to an agent
+	 * 
+	 * @param agentId the identifier of the agent
+	 * @param time the time at which the perception is sent
+	 * @param perceivedObjects the list of perceived objects
+	 * @param position current position of the agent's body
+	 */
+	def sendPerceptions(agentId : UUID, time : long, perceivedObjects : List<EnvironmentBody>, position : Vector2) {
+		emit(new Perception(agentId, time, perceivedObjects, position))
+			[it == new Address(defaultSpace.spaceID, agentId)]
 	}
 }
 
@@ -158,13 +174,17 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
  */
 skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	
+	uses DefaultContextInteractions
 	/** 
 	 * Sends the environment a message, asking to be moved
 	 * 
 	 * @param agentId identifier of the agent to move
-	 * @param direction the <code>Vector2</code> to follow, with a defined magnitude
+	 * @param environmentAddress the address the motion query must be sent
+	 * @param time the time at which the movement query is sent
+	 * @param motion data about the path to follow
 	 */
-	def move(agentId : UUID, direction : Vector2) {
-		// TODO
+	def move(agentId : UUID, environmentAddress : Address, time : long, motion : MotionQuery) {
+		emit(new Action(agentId, time, motion))
+			[it == environmentAddress]
 	}
 }

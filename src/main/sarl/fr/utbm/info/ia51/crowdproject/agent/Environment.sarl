@@ -30,21 +30,26 @@ import java.util.LinkedList
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.core.Lifecycle
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import java.util.List
 import org.dyn4j.geometry.Vector2
 import java.util.Random
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import java.util.UUID
+import java.util.TreeMap
 
 /**
  * The environment agent, managing all the other agents
  */
 agent Environment {
 	
-	uses Logging, Lifecycle, DefaultContextInteractions, EnvironmentManager
+	uses Logging, Lifecycle, DefaultContextInteractions, EnvironmentManager, EnvironmentFrontEnd
 
-	val agentBodies : List<AgentBody> = new LinkedList
+	val agentBodies = new TreeMap<UUID, AgentBody> 
 	val actions = new LinkedList<MotionQuery>
-	var time = 0 as long
 	var targetPosition : Vector2
+
+	var motionBehavior : MotionBehavior
+	var time = 0 as long
 	val random = new Random
 
 	on Initialize {
@@ -52,20 +57,20 @@ agent Environment {
 		var height = occurrence.parameters.get(1) as Float
 		var nbHamsters = occurrence.parameters.get(2) as Integer
 		var perceptionDistance = occurrence.parameters.get(3) as Float
+		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
 		
 		info("Beginning of the simulation. Spawning the environment agent.")
 		
 		setSkill(new DefaultEnvironmentManager(width, height), typeof(EnvironmentManager))
+		setSkill(new DefaultEnvironmentFrontEnd, typeof(EnvironmentFrontEnd))
 		
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
-			var agentBody = createHamster(
-				if (random.nextBoolean) perceptionDistance else 0,
-				random.nextBoolean)
-			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext)
+			var isDeaf = random.nextBoolean
+			var agentBody = createHamster(if (isDeaf) perceptionDistance else 0, isDeaf)
+			agentBodies.put(agentBody.agentId, agentBody)
+			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, motionBehavior)
 		}
-		
-		targetPosition = new Vector2(0.0f, 0.0f) // TODO
 		
 		emit(new RunBeginningOfStep)
 	}
@@ -78,16 +83,16 @@ agent Environment {
 		synchronized (this) {
 			this.actions.clear
 
-			for (e : getPerceptions(agentBodies).entrySet) {
+			for (e : getPerceptions(agentBodies.values).entrySet) {
 				val agentId = e.key.agentId
-				emit(new Perception(agentId, e.value, e.key.position, this.time))
+				sendPerceptions(agentId, this.time, e.value, e.key.position)
 			}
 		}
 	}
 	
 	on Action [occurrence.time >= this.time] {
 		synchronized (this) {
-			this.actions += new MotionQuery(occurrence.source.UUID, occurrence.direction)
+			this.actions += occurrence.motion
 			
 			if (this.actions.size >= this.agentBodies.size - 1) {
 				emit(new RunEndOfStep)
@@ -101,11 +106,10 @@ agent Environment {
 			// actions += ...
 			
 			// Change the state of the universe
-			applyActions(this.actions)
+			applyActions(this.actions, this.agentBodies)
 
-			if (isTargetReached(agentBodies, targetPosition)) {
-				// do something to notify that all hamsters reached the target
-				// TODO
+			if (isTargetReached(agentBodies.values, targetPosition)) {
+				// TODO do something to notify that all hamsters reached the target
 				killMe
 			}
 			

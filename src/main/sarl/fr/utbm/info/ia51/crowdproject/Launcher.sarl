@@ -28,7 +28,7 @@ import io.janusproject.util.LoggerCreator
 import java.util.logging.Level
 import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.ui.CrowdProjectGUI
-import fr.utbm.info.ia51.crowdproject.environment.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 
 class Launcher {
 	
@@ -38,7 +38,6 @@ class Launcher {
 	public static val NB_HAMSTERS = 10
 	public static val PERCEPTION_DISTANCE = 15.0f
 	
-	public static val TARGET_OFFSET = 1.0f
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
 
 	static def main(args : String[]) : void {
@@ -53,7 +52,8 @@ class Launcher {
 				WIDTH,
 				HEIGHT,
 				NB_HAMSTERS,
-				PERCEPTION_DISTANCE)
+				PERCEPTION_DISTANCE,
+				MOTION_BEHAVIOR)
 	}
 
 }

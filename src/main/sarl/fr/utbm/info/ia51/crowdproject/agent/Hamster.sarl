@@ -26,20 +26,37 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import io.sarl.core.Initialize
 import io.sarl.core.Logging
 import io.sarl.core.Destroy
-import io.sarl.core.DefaultContextInteractions
-import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 
 /**
  * The hamster agent
  */
 agent Hamster extends Animat {
+
+	var wanderBehavior : WanderAlgorithm
+
+	val STOP_RADIUS = Math.PI / 10f
+	val SLOW_RADIUS = Math.PI / 4f
+	val WANDER_CIRCLE_DISTANCE = 60f
+	val WANDER_CIRCLE_RADIUS = 20f
+	val WANDER_MAX_ROTATION = Math.PI / 10f
 	
-	uses Logging, DefaultContextInteractions, EnvironmentMotion
+	uses Logging, EnvironmentMotion
 	
 	on Initialize {
 		info("New hamster spawned.")
 
 		setSkill(new DefaultEnvironmentMotion, typeof(EnvironmentMotion))
+		
+		if (this.motionBehavior == MotionBehavior::KINEMATIC) {
+			this.wanderBehavior = new KinematicWanderAlgorithm
+		} else if (this.motionBehavior == MotionBehavior::STEERING) {
+			this.wanderBehavior = new SteeringWanderAlgorithm
+		}
 	}
 
 	on Destroy {
@@ -47,10 +64,16 @@ agent Hamster extends Animat {
 	}
 	
 	on Perception {
-		// Compute the perception and decide what to do
-		var vector = new Vector2(0, 0) // TODO
 		
-		emit(new Action(vector, occurrence.time))
-			[it == occurrence.source]
+		var computedMotion : MotionQuery
+		
+		// If the target has been perceived
+//		if (target !== null) {
+//			// TODO
+		// } else {
+			computedMotion = this.wanderBehavior.run
+//		}
+		
+		move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
 	}
 }
