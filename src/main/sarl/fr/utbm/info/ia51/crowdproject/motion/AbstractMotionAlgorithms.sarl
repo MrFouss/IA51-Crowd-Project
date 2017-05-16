@@ -21,35 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.^agent
-
-import org.dyn4j.geometry.Vector2
-import java.util.UUID
+package fr.utbm.info.ia51.crowdproject.motion
 
 /** 
- * Message sent from an agent to the environment, asking to move in a direction
+ * 
  */
-package final class MotionQuery {
-	
-	val emitter : UUID
-	val accelerationVector : Vector2
-
-	new (emitter : UUID, accelerationVector : Vector2) {
-		this.emitter = emitter
-		this.accelerationVector = accelerationVector
-	}
-	
-	/** 
-	 * Replies the emitter of the query
-	 */
-	def getEmitter : UUID {
-		this.emitter
-	}
-	
-	/** 
-	 * Replies the acceleration vector
-	 */
-	def getMotionVector : Vector2 {
-		this.accelerationVector
-	}
+interface WanderAlgorithm {
+	def run : MotionQuery
 }
