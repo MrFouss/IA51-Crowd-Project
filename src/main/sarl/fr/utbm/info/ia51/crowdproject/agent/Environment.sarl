@@ -36,6 +36,7 @@ import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import java.util.UUID
 import java.util.TreeMap
+import java.util.ArrayList
 
 /**
  * The environment agent, managing all the other agents
@@ -69,7 +70,10 @@ agent Environment {
 			var isDeaf = random.nextBoolean
 			var agentBody = createHamster(if (isDeaf) perceptionDistance else 0, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
-			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, motionBehavior)
+			
+			var params = new ArrayList<Object>
+			params += #[agentBody.agentId, motionBehavior]
+			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, params)
 		}
 		
 		emit(new RunBeginningOfStep)
@@ -80,6 +84,7 @@ agent Environment {
 	}
 
 	on RunBeginningOfStep {
+		info("Beginning of a new step")
 		synchronized (this) {
 			this.actions.clear
 
@@ -90,7 +95,7 @@ agent Environment {
 		}
 	}
 	
-	on Action [occurrence.time >= this.time] {
+	on Action [it.time == this.time] {
 		synchronized (this) {
 			this.actions += occurrence.motion
 			
@@ -114,7 +119,7 @@ agent Environment {
 			}
 			
 			// Increase time value
-			time++
+			//time++
 
 			// Move to next step
 			emit(new RunBeginningOfStep)

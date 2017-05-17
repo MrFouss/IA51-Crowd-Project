@@ -26,6 +26,8 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import io.sarl.core.Initialize
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.sarl.core.Lifecycle
+import java.util.UUID
+import java.util.List
 
 /**
  * Abstract representation of an animat
@@ -34,17 +36,24 @@ abstract agent Animat {
 	
 	uses Lifecycle
 	
+	var agentId : UUID
 	var motionBehavior : MotionBehavior
 	
 	on Initialize {
-		this.motionBehavior = occurrence.parameters.get(0) as MotionBehavior
+		var params = occurrence.parameters.get(0) as List<Object>
+		this.agentId = params.get(0) as UUID
+		this.motionBehavior = params.get(1) as MotionBehavior
 	}
 	
 	on EndOfSimulation {
 		killMe
 	}
+
+	protected def getAgentId : UUID {
+		return this.agentId
+	}
 	
-	def getMotionBehavior : MotionBehavior {
+	protected def getMotionBehavior : MotionBehavior {
 		return this.motionBehavior
 	}
 }

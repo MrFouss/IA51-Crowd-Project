@@ -46,6 +46,8 @@ import java.util.Collection
  */
 skill DefaultEnvironmentManager implements EnvironmentManager {
 
+	val UPDATE_TIME = 0.1f
+
 	var world : World
 
 	new (width : float, height : float) {
@@ -90,10 +92,11 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
 	def isTargetReached(agentBodies : Collection<AgentBody>, targetPosition : Vector2) : boolean {
-		for (body : agentBodies) {
-			// TODO if any agent's body isn't within a certain range of the target, return false
-		}
-		return true
+		return false
+//		for (body : agentBodies) {
+//			// TODO if any agent's body isn't within a certain range of the target, return false
+//		}
+//		return true
 	}
 	
 	/** 
@@ -148,6 +151,13 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 */
 	def moveObject(object : MobileBody, motion : MotionQuery) {
 		// TODO
+	}
+	
+	/** 
+	 * Updates the physical state of the environment
+	 */
+	def updateEnvironment {
+		world.update(UPDATE_TIME)
 	}
 }
 

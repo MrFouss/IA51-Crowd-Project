@@ -96,6 +96,11 @@ capacity EnvironmentManager {
 	 * @param motion data about the path the path to follow
 	 */
 	def moveObject(object : MobileBody, motion : MotionQuery)
+	
+	/**
+	 * Updates the physical state of the environment
+	 */
+	def updateEnvironment
 }
 
 /**

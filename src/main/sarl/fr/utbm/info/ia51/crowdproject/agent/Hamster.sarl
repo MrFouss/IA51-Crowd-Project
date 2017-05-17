@@ -56,6 +56,8 @@ agent Hamster extends Animat {
 			this.wanderBehavior = new KinematicWanderAlgorithm
 		} else if (this.motionBehavior == MotionBehavior::STEERING) {
 			this.wanderBehavior = new SteeringWanderAlgorithm
+		} else {
+			System.out.println("Wut?!")
 		}
 	}
 
@@ -63,17 +65,18 @@ agent Hamster extends Animat {
 		info("A hamster has been killed")
 	}
 	
-	on Perception {
-		
-		var computedMotion : MotionQuery
-		
-		// If the target has been perceived
-//		if (target !== null) {
-//			// TODO
-		// } else {
-			computedMotion = this.wanderBehavior.run
-//		}
-		
-		move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
+	on Perception [it.agentId == this.agentId] {
+		synchronized(this) {
+			var computedMotion : MotionQuery
+			
+			// If the target has been perceived
+//			if (target !== null) {
+//				// TODO
+//			} else {
+				computedMotion = this.wanderBehavior.run(occurrence.agentId)
+//			}
+			
+			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
+		}
 	}
 }

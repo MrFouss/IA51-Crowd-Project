@@ -23,13 +23,17 @@
  */
 package fr.utbm.info.ia51.crowdproject.motion
 
+import java.util.UUID
+
 /** 
  * 
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
 	
-	override run : MotionQuery {
+	override run(emitter : UUID) : MotionQuery {
+		val query = new MotionQuery(emitter, MotionBehavior::KINEMATIC)
 		// TODO
+		return query
 	}
 }
 
@@ -38,7 +42,9 @@ class KinematicWanderAlgorithm implements WanderAlgorithm {
  */
 class SteeringWanderAlgorithm implements WanderAlgorithm {
 
-	override run : MotionQuery {
+	override run(emitter : UUID) : MotionQuery {
+		val query = new MotionQuery(emitter, MotionBehavior::STEERING)
 		// TODO
+		return query
 	}
 }
