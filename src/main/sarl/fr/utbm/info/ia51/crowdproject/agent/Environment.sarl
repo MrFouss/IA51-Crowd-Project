@@ -118,8 +118,11 @@ agent Environment {
 				killMe
 			}
 			
+			// Informs the view that a front end update is needed
+			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
+			
 			// Increase time value
-			//time++
+			time++
 
 			// Move to next step
 			emit(new RunBeginningOfStep)

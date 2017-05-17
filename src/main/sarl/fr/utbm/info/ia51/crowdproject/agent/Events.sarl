@@ -28,6 +28,7 @@ import java.util.List
 import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 
 /**
  * A perception for an agent
@@ -77,3 +78,27 @@ event RunEndOfStep
  * Event called at the end of the simulation
  */
 event EndOfSimulation
+
+/** 
+ * Event called to initialize the placement of all objects on the scene, including the static objects
+ */
+event FrontEndEnvironmentInitialization {
+
+	var objects : List<EnvironmentBody>
+
+	new(objects : List<EnvironmentBody>) {
+		this.objects = objects
+	}
+}
+
+/**
+ * Event called each time the view has to be updated
+ */
+event FrontEndEnvironmentChange {
+	
+	var objects : List<MobileBody>
+
+	new(objects : List<MobileBody>) {
+		this.objects = objects
+	}
+}
