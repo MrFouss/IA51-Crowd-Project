@@ -118,6 +118,8 @@ agent Environment {
 				killMe
 			}
 			
+			emit(new EnvironmentSituation(agentBodies))
+			
 			// Increase time value
 			//time++
 

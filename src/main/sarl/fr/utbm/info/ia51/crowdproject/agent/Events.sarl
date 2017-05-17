@@ -28,8 +28,8 @@ import java.util.List
 import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
-import java.util.ArrayList
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import java.util.TreeMap
 
 /**
  * A perception for an agent
@@ -81,11 +81,11 @@ event RunEndOfStep
 event EndOfSimulation
 
 event EnvironmentSituation {
-	var hamsters : ArrayList<AgentBody>
-	var objects : ArrayList<EnvironmentBody>
+	var hamsters : TreeMap<UUID, AgentBody>
+	//var objects : ArrayList<EnvironmentBody>
 
-	new(hamsters : ArrayList<AgentBody>, objects : ArrayList<EnvironmentBody>) {
+	new(hamsters : TreeMap<UUID, AgentBody>/*, objects : ArrayList<EnvironmentBody>*/) {
 		this.hamsters = hamsters
-		this.objects = objects
+		//this.objects = objects
 	}
 }

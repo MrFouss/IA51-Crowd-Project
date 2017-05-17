@@ -3,10 +3,14 @@
  */
 package fr.utbm.info.ia51.crowdproject.ui
 
-import io.sarl.lang.core.EventListener
-import io.sarl.lang.core.Event
-import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.^agent.EnvironmentSituation
+import io.sarl.lang.core.Event
+import io.sarl.lang.core.EventListener
+import java.util.TreeMap
+import java.util.UUID
+import javafx.scene.layout.AnchorPane
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Shape
 
 /** 
  * @author krophil
@@ -14,7 +18,15 @@ import fr.utbm.info.ia51.crowdproject.^agent.EnvironmentSituation
  */
 class FXMLViewerController implements EventListener {
 	
+	private final val DEFAULT_RADIUS = 2
+	
 	private val id : UUID = UUID.randomUUID
+	private val shapes : TreeMap<UUID, Shape> = new TreeMap()
+	private var root : AnchorPane
+
+	new(root:AnchorPane) {
+		this.root = root
+	}
 
 	@Override
 	override getID : UUID {
@@ -24,7 +36,15 @@ class FXMLViewerController implements EventListener {
 	@Override
 	override receiveEvent(^event : Event) {
 		if (^event instanceof EnvironmentSituation) {
-			// TODO Auto-generated code.
+			^event.hamsters.forEach[key, body|
+					val c : Circle = new Circle(body.position.x, body.position.y, DEFAULT_RADIUS)
+					shapes.put(key, c)
+			]
 		}
+		
+		//Really dirty updating way
+		//I'll implement some listeners when i'll be sure of the shapes
+		root.children.removeAll()
+		root.children.addAll(shapes.values)
 	}
 }
