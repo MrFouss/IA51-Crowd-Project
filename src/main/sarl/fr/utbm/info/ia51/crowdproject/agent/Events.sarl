@@ -28,8 +28,7 @@ import java.util.List
 import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
-import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import java.util.TreeMap
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 
 /**
  * A perception for an agent
@@ -80,12 +79,26 @@ event RunEndOfStep
  */
 event EndOfSimulation
 
-event EnvironmentSituation {
-	var hamsters : TreeMap<UUID, AgentBody>
-	//var objects : ArrayList<EnvironmentBody>
+/** 
+ * Event called to initialize the placement of all objects on the scene, including the static objects
+ */
+event FrontEndEnvironmentInitialization {
 
-	new(hamsters : TreeMap<UUID, AgentBody>/*, objects : ArrayList<EnvironmentBody>*/) {
-		this.hamsters = hamsters
-		//this.objects = objects
+	var objects : List<EnvironmentBody>
+
+	new(objects : List<EnvironmentBody>) {
+		this.objects = objects
+	}
+}
+
+/**
+ * Event called each time the view has to be updated
+ */
+event FrontEndEnvironmentChange {
+	
+	var objects : List<MobileBody>
+
+	new(objects : List<MobileBody>) {
+		this.objects = objects
 	}
 }

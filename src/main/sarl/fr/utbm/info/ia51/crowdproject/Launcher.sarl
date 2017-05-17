@@ -49,6 +49,7 @@ class Launcher extends Application {
 
 	@Override
 	public def start(stage : Stage) throws Exception {
+		
 		//FXML to improve with options
 		var location : URL = getClass().getResource("view/FXApplication.fxml")
 		loader = new FXMLLoader()
@@ -67,19 +68,18 @@ class Launcher extends Application {
 	}
 
 	public static def main(args : String[]) {
-		Boot::startJanus(typeof(Environment),
-						WIDTH, 
-						HEIGHT, 
-						NB_HAMSTERS, 
-						PERCEPTION_DISTANCE, 
-						MOTION_BEHAVIOR)
+		Boot::startJanus(
+				typeof(Environment),
+				WIDTH, 
+				HEIGHT, 
+				NB_HAMSTERS, 
+				PERCEPTION_DISTANCE, 
+				MOTION_BEHAVIOR)
 		launch(args);
 	}
 
-		
 	@Override
 	public def stop() throws Exception {
 		super.stop();
 	}
-
 }
