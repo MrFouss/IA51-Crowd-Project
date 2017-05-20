@@ -23,15 +23,18 @@
  */
 package fr.utbm.info.ia51.crowdproject.ui
 
+import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
+import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import io.sarl.lang.core.Event
 import io.sarl.lang.core.EventListener
-import java.util.UUID
-import javafx.scene.layout.AnchorPane
-import javafx.scene.shape.Shape
-import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
-import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import java.util.LinkedList
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import java.util.UUID
+import javafx.animation.AnimationTimer
+import javafx.scene.layout.AnchorPane
+import javafx.scene.shape.Circle
+import javafx.scene.shape.Rectangle
+import javafx.scene.shape.Shape
 
 /** 
  * 
@@ -41,9 +44,17 @@ class FXMLViewerController implements EventListener {
 	val id = UUID.randomUUID
 	val shapes = new LinkedList<Shape>
 	var root : AnchorPane
+	val animationTimer : AnimationTimer
 
 	new(root:AnchorPane) {
 		this.root = root
+		this.animationTimer = new AnimationTimer(){
+			override handle(now : long) {
+				// FIXME really dirty updating method
+				root.children.removeAll
+				root.children.addAll(shapes)
+			}
+		}
 	}
 
 	@Override
@@ -58,6 +69,7 @@ class FXMLViewerController implements EventListener {
 			^event.objects.forEach [ object |
 				val shape = createShape(object)
 				shapes += shape
+				this.animationTimer.start
 			]
 		} else if (^event instanceof FrontEndEnvironmentChange) {
 			^event.objects.forEach [ object |
@@ -65,16 +77,38 @@ class FXMLViewerController implements EventListener {
 				shapes += shape
 			]
 		}
-		
-		// FIXME really dirty updating method
-		root.children.removeAll()
-		root.children.addAll(shapes)
 	}
 	
 	/**
+	 * Used to create the JavaFx shapes from dyn4j shapes
+	 * @param object an environmentBody that needs to have a dyn4j shape
 	 * 
 	 */
-	private def createShape(object : EnvironmentBody) : Shape {
-		// TODO return a JavaFX shape according to the Dyn4j shape
+	private def createShape(object : EnvironmentBody) : Shape
+		throws GeometryConversionException {
+		var geometry = object.fixtures.get(0).shape
+
+		if(geometry instanceof org.dyn4j.geometry.Circle) {
+			var g = geometry as org.dyn4j.geometry.Circle
+			new Circle(
+				object.position.x,
+				object.position.y,
+				g.radius)
+		} else if(geometry instanceof org.dyn4j.geometry.Rectangle) {
+			var g = geometry as org.dyn4j.geometry.Rectangle
+			new Rectangle(
+						object.position.x-g.width/2, //Need to be translated in
+						object.position.y-g.width/2, //order to center the figure
+						g.width,
+						g.height)
+		} else {
+			throw new GeometryConversionException
+		}
+	}
+}
+
+class GeometryConversionException extends Exception {
+	new() {
+		System.err.println("This object has a shape that doesn't exist yet.")
 	}
 }
