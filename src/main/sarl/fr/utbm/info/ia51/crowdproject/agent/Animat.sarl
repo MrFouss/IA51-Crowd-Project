@@ -40,7 +40,10 @@ abstract agent Animat {
 	var motionBehavior : MotionBehavior
 	
 	on Initialize {
-		var params = occurrence.parameters.get(0) as List<Object>
+		initializationMethod(occurrence.parameters.get(0) as List<Object>)
+	}
+
+	abstract def initializationMethod(params : List<Object>) : void {
 		this.agentId = params.get(0) as UUID
 		this.motionBehavior = params.get(1) as MotionBehavior
 	}

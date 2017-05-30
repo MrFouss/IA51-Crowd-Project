@@ -31,6 +31,7 @@ import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import java.util.List
 
 /**
  * The hamster agent
@@ -47,17 +48,16 @@ agent Hamster extends Animat {
 	
 	uses Logging, EnvironmentMotion
 	
-	on Initialize {
+	override initializationMethod(params : List<Object>) : void {
 		info("New hamster spawned.")
-
 		setSkill(new DefaultEnvironmentMotion, typeof(EnvironmentMotion))
+		
+		super.initializationMethod(params)
 		
 		if (this.motionBehavior == MotionBehavior::KINEMATIC) {
 			this.wanderBehavior = new KinematicWanderAlgorithm
 		} else if (this.motionBehavior == MotionBehavior::STEERING) {
 			this.wanderBehavior = new SteeringWanderAlgorithm
-		} else {
-			System.out.println("Wut?!")
 		}
 	}
 
