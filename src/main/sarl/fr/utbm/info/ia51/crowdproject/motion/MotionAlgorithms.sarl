@@ -24,13 +24,14 @@
 package fr.utbm.info.ia51.crowdproject.motion
 
 import java.util.UUID
+import org.dyn4j.geometry.Vector2
 
 /** 
  * 
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
 	
-	override run(emitter : UUID) : MotionQuery {
+	override run(emitter : UUID, currentPosition : Vector2) : MotionQuery {
 		val query = new MotionQuery(emitter, MotionBehavior::KINEMATIC)
 		// TODO
 		return query
@@ -42,7 +43,7 @@ class KinematicWanderAlgorithm implements WanderAlgorithm {
  */
 class SteeringWanderAlgorithm implements WanderAlgorithm {
 
-	override run(emitter : UUID) : MotionQuery {
+	override run(emitter : UUID, currentPosition : Vector2) : MotionQuery {
 		val query = new MotionQuery(emitter, MotionBehavior::STEERING)
 		// TODO
 		return query

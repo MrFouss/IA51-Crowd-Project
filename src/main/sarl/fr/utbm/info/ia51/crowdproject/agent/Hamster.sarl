@@ -73,7 +73,7 @@ agent Hamster extends Animat {
 //			if (target !== null) {
 //				// TODO
 //			} else {
-				computedMotion = this.wanderBehavior.run(occurrence.agentId)
+				computedMotion = this.wanderBehavior.run(occurrence.agentId, occurrence.position)
 //			}
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)

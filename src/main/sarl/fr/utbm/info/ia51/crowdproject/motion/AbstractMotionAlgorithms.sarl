@@ -24,11 +24,12 @@
 package fr.utbm.info.ia51.crowdproject.motion
 
 import java.util.UUID
+import org.dyn4j.geometry.Vector2
 
 /** 
  * 
  */
 interface WanderAlgorithm {
 	
-	def run(emitter : UUID) : MotionQuery
+	def run(emitter : UUID, currentPosition : Vector2) : MotionQuery
 }
