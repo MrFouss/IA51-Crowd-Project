@@ -46,6 +46,8 @@ class Launcher extends Application {
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
 
 	private var loader : FXMLLoader
+	
+	private static var CONTROLLER : FXMLViewerController
 
 	@Override
 	public def start(stage : Stage) throws Exception {
@@ -56,8 +58,17 @@ class Launcher extends Application {
 		var root : AnchorPane = loader.load(location.openStream()) as AnchorPane
 		
 		//New controller linked to FXML
-		var c : FXMLViewerController = new FXMLViewerController(root)
-		loader.controller = c
+		CONTROLLER = new FXMLViewerController(root)
+
+		Boot::startJanus(typeof(Environment),
+						 WIDTH,
+						 HEIGHT,
+						 NB_HAMSTERS,
+						 PERCEPTION_DISTANCE,
+						 MOTION_BEHAVIOR,
+						 CONTROLLER)
+		
+		loader.controller = CONTROLLER
 		loader.setLocation(location)
 		loader.setBuilderFactory(new JavaFXBuilderFactory())
 		var scene : Scene = new Scene(root)
@@ -68,13 +79,6 @@ class Launcher extends Application {
 	}
 
 	public static def main(args : String[]) {
-		Boot::startJanus(
-				typeof(Environment),
-				WIDTH, 
-				HEIGHT, 
-				NB_HAMSTERS, 
-				PERCEPTION_DISTANCE, 
-				MOTION_BEHAVIOR)
 		launch(args);
 	}
 
