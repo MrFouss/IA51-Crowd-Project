@@ -23,7 +23,6 @@
  */
 package fr.utbm.info.ia51.crowdproject.^agent
 
-import io.sarl.core.Initialize
 import io.sarl.core.Logging
 import io.sarl.core.Destroy
 import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
