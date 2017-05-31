@@ -90,7 +90,7 @@ agent Environment {
 
 			for (e : getPerceptions(agentBodies.values).entrySet) {
 				val agentId = e.key.agentId
-				sendPerceptions(agentId, this.time, e.value, e.key.position)
+				sendPerceptions(agentId, this.time, e.value, e.key.position, e.key.orientation)
 			}
 		}
 	}

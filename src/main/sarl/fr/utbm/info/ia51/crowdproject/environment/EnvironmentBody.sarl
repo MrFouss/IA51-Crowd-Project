@@ -63,4 +63,8 @@ abstract class EnvironmentBody extends Body {
 	def getPosition : Vector2 {
 		return this.worldCenter
 	}
+	
+	def getOrientation : double {
+		return this.transform.rotation
+	}
 }
