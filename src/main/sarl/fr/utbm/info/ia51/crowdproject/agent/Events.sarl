@@ -23,12 +23,13 @@
  */
 package fr.utbm.info.ia51.crowdproject.^agent
 
-import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import java.util.List
 import java.util.UUID
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
-import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import org.dyn4j.geometry.Vector2
 
 /**
  * A perception for an agent
