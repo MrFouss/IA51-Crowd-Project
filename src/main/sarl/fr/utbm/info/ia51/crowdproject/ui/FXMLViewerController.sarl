@@ -28,7 +28,7 @@ import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import io.sarl.lang.core.Event
 import io.sarl.lang.core.EventListener
-import java.util.ArrayList
+import java.util.TreeMap
 import java.util.UUID
 import javafx.animation.AnimationTimer
 import javafx.scene.layout.AnchorPane
@@ -42,7 +42,7 @@ import javafx.scene.shape.Shape
 class FXMLViewerController implements EventListener {
 	
 	val id = UUID.randomUUID
-	val shapes = new ArrayList<Shape>
+	val shapes = new TreeMap<UUID, Shape>
 	var root : AnchorPane
 	val animationTimer : AnimationTimer
 
@@ -51,8 +51,8 @@ class FXMLViewerController implements EventListener {
 		this.animationTimer = new AnimationTimer(){
 			
 			override handle(now : long) {
-				root.children.removeAll(shapes)
-				root.children.addAll(shapes)
+				root.children.removeAll(shapes.values)
+				root.children.addAll(shapes.values)
 			}
 		}
 	}
@@ -68,16 +68,15 @@ class FXMLViewerController implements EventListener {
 
 			if (^event instanceof FrontEndEnvironmentInitialization) {
 				^event.objects.forEach [ object |
-						val shape = createShape(object)
-						shapes.add(shape)
+					val shape = createShape(object)
+					shapes.put(object.id, shape)
 				]
 				this.animationTimer.start
 	
 			} else if (^event instanceof FrontEndEnvironmentChange) {
-				shapes.removeAll(shapes)
 				^event.objects.forEach [ object |
-						val shape = createShape(object)
-						shapes.add(shape)
+					val shape = createShape(object)
+					shapes.put(object.id, shape)
 				]
 			}
 		}
