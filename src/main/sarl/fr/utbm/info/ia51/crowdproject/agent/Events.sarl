@@ -87,9 +87,9 @@ event EndOfSimulation
  */
 event FrontEndEnvironmentInitialization {
 
-	var objects : List<AgentBody>
+	var objects : List<EnvironmentBody>
 
-	new(objects : List<AgentBody>) {
+	new(objects : List<EnvironmentBody>) {
 		this.objects = objects
 	}
 }

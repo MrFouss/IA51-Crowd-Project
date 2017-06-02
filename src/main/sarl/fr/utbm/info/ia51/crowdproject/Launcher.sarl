@@ -45,9 +45,13 @@ class Launcher extends Application {
 	
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
 
-	private var loader : FXMLLoader
-	
 	private static var CONTROLLER : FXMLViewerController
+
+	private var loader : FXMLLoader
+
+	public static def main(args : String[]) {
+		launch(args);
+	}
 
 	@Override
 	public def start(stage : Stage) throws Exception {
@@ -76,10 +80,6 @@ class Launcher extends Application {
 		stage.setTitle("Crowd Project")
 		stage.setScene(scene)
 		stage.show()
-	}
-
-	public static def main(args : String[]) {
-		launch(args);
 	}
 
 	@Override

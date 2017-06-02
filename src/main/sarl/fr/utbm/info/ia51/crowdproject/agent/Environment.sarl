@@ -64,7 +64,8 @@ agent Environment {
 		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
 		var controller = occurrence.parameters.get(5) as FXMLViewerController
 
-		(defaultSpace as OpenEventSpace).register(controller) // instance du controller
+		// Instance of the controller
+		(defaultSpace as OpenEventSpace).register(controller)
 
 		info("Beginning of the simulation. Spawning the environment agent.")
 
@@ -81,6 +82,7 @@ agent Environment {
 			params += #[agentBody.agentId, motionBehavior]
 			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, params)
 		}
+		
 		emit(new FrontEndEnvironmentInitialization(new ArrayList(agentBodies.values)))
 		emit(new RunBeginningOfStep)
 	}
