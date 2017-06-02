@@ -89,8 +89,7 @@ class FXMLViewerController implements EventListener {
 	 * @param object an environmentBody that needs to have a dyn4j shape
 	 * @return the newly created JavaFX shape
 	 */
-	private def createShape(object : EnvironmentBody) : Shape
-		throws GeometryConversionException {
+	private def createShape(object : EnvironmentBody) : Shape {
 		var geometry = object.fixtures.get(0).shape
 
 		if(geometry instanceof org.dyn4j.geometry.Circle) {
