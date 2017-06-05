@@ -121,8 +121,7 @@ capacity EnvironmentFrontEnd {
 		time : long,
 		perceivedObjects : List<EnvironmentBody>,
 		position : Vector2,
-		orientation : double,
-		velocity : Vector2)
+		orientation : double)
 }
 
 /**

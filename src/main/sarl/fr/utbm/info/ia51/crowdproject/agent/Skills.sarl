@@ -174,8 +174,8 @@ skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
 	 * @param position current position of the agent's body
 	 * @param orientation current orientation the agent's body is facing
 	 */
-	def sendPerceptions(agentId : UUID, time : long, perceivedObjects : List<EnvironmentBody>, position : Vector2, orientation : double, velocity : Vector2) {
-		emit(new Perception(agentId, time, perceivedObjects, position, orientation, velocity))
+	def sendPerceptions(agentId : UUID, time : long, perceivedObjects : List<EnvironmentBody>, position : Vector2, orientation : double) {
+		emit(new Perception(agentId, time, perceivedObjects, position, orientation))
 			[it == new Address(defaultSpace.spaceID, agentId)]
 	}
 }

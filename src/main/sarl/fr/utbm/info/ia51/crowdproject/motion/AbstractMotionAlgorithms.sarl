@@ -32,17 +32,11 @@ import org.dyn4j.geometry.Vector2
 interface WanderAlgorithm {
 
 	val MAX_SPEED = 60f
-	val ANGULAR_SPEED = Math.PI / 10f
-
 	val STOP_RADIUS = Math.PI / 10f
 	val SLOW_RADIUS = Math.PI / 4f
 	val WANDER_CIRCLE_DISTANCE = 60f
 	val WANDER_CIRCLE_RADIUS = 20f
-	val WANDER_MAX_ROTATION = Math.PI / 10f
 
-	def run(emitter : UUID, currentPosition : Vector2, orientation : double, velocity : Vector2) : MotionQuery
+	def run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery
 
-	def binomialRandom : float {
-		return Math.random as float
-	}
 }

@@ -40,15 +40,13 @@ event Perception {
 	val objects : List<EnvironmentBody>
 	val position : Vector2
 	val orientation : double
-	val velocity : Vector2
 
-	new (agentId : UUID, time : long, objects : List<EnvironmentBody>, position : Vector2, orientation : double, velocity : Vector2) {
+	new (agentId : UUID, time : long, objects : List<EnvironmentBody>, position : Vector2, orientation : double) {
 		this.agentId = agentId
 		this.time = time
 		this.objects = objects
 		this.position = position
 		this.orientation = orientation
-		this.velocity = velocity
 	}
 }
 

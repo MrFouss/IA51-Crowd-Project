@@ -67,8 +67,4 @@ abstract class EnvironmentBody extends Body {
 	def getOrientation : double {
 		return this.transform.rotation
 	}
-
-	def getVelocity : Vector2 {
-		return this.velocity
-	}
 }
