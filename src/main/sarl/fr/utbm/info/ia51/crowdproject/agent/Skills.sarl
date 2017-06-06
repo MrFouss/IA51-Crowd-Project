@@ -23,23 +23,23 @@
  */
 package fr.utbm.info.ia51.crowdproject.^agent
 
-import java.util.List
-import java.util.Map
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import org.dyn4j.geometry.Vector2
-import java.util.TreeMap
-import org.dyn4j.dynamics.World
-import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
-import java.util.LinkedList
-import org.dyn4j.geometry.Geometry
-import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import org.dyn4j.collision.AxisAlignedBounds
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.lang.core.Address
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import java.util.Collection
+import java.util.LinkedList
+import java.util.List
+import java.util.Map
+import java.util.TreeMap
+import java.util.UUID
+import org.dyn4j.collision.AxisAlignedBounds
+import org.dyn4j.dynamics.World
+import org.dyn4j.geometry.Geometry
+import org.dyn4j.geometry.Vector2
 
 /** 
  * Default implementation of the EnvironmentManager capacity

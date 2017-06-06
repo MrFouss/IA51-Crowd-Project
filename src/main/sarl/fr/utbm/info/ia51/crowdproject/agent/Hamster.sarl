@@ -39,12 +39,6 @@ agent Hamster extends Animat {
 
 	var wanderBehavior : WanderAlgorithm
 
-	val STOP_RADIUS = Math.PI / 10f
-	val SLOW_RADIUS = Math.PI / 4f
-	val WANDER_CIRCLE_DISTANCE = 60f
-	val WANDER_CIRCLE_RADIUS = 20f
-	val WANDER_MAX_ROTATION = Math.PI / 10f
-	
 	uses Logging, EnvironmentMotion
 	
 	override initializationMethod(params : List<Object>) : void {
@@ -72,7 +66,7 @@ agent Hamster extends Animat {
 //			if (target !== null) {
 //				// TODO
 //			} else {
-				computedMotion = this.wanderBehavior.run(occurrence.agentId, occurrence.position)
+				computedMotion = this.wanderBehavior.run(occurrence.agentId, occurrence.position, occurrence.orientation)
 //			}
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)

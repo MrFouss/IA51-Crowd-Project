@@ -30,11 +30,15 @@ import org.dyn4j.geometry.Vector2
  * 
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
-	
-	override run(emitter : UUID, currentPosition : Vector2) : MotionQuery {
-		val query = new MotionQuery(emitter, MotionBehavior::KINEMATIC)
-		// TODO
-		return query
+
+	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
+		var l = Vector2.create(MAX_SPEED, orientation)
+		var a = Math.random-Math.random
+
+		return new MotionQuery(emitter, MotionBehavior::KINEMATIC) => [
+			linear = l
+			angular = a as float
+		]
 	}
 }
 
@@ -43,9 +47,21 @@ class KinematicWanderAlgorithm implements WanderAlgorithm {
  */
 class SteeringWanderAlgorithm implements WanderAlgorithm {
 
-	override run(emitter : UUID, currentPosition : Vector2) : MotionQuery {
-		val query = new MotionQuery(emitter, MotionBehavior::STEERING)
-		// TODO
-		return query
+	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
+		/* Calculate the circle center */
+		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
+
+		/* Calculate the displacement and its angle */
+		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
+		var wanderingAngle = Math.random - Math.random
+		displacement.rotate(wanderingAngle)
+
+		/* Calculate the wandering force and change the speed */
+		var wanderingForce = center.add(displacement)
+		wanderingForce.magnitude = MAX_SPEED
+
+		return new MotionQuery(emitter, MotionBehavior::STEERING) => [
+			linear = wanderingForce
+		]
 	}
 }
