@@ -64,8 +64,10 @@ agent Environment {
 		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
 		var controller = occurrence.parameters.get(5) as FXMLViewerController
 
-		// Instance of the controller
+		// Communication from environment to UI
 		(defaultSpace as OpenEventSpace).register(controller)
+		// Communication from UI to environment
+		controller.openSpace = defaultSpace as OpenEventSpace
 
 		info("Beginning of the simulation. Spawning the environment agent.")
 
@@ -135,5 +137,9 @@ agent Environment {
 			// Move to next step
 			emit(new RunBeginningOfStep)
 		}
+	}
+
+	on EndOfSimulation {
+		killMe
 	}
 }

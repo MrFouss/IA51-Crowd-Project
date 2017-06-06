@@ -23,7 +23,6 @@
  */
 package fr.utbm.info.ia51.crowdproject.^agent
 
-import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery

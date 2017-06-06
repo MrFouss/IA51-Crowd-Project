@@ -85,5 +85,6 @@ class Launcher extends Application {
 	@Override
 	public def stop() throws Exception {
 		super.stop();
+		CONTROLLER.fireGameOver
 	}
 }

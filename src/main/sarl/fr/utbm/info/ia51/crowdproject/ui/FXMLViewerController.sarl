@@ -26,8 +26,10 @@ package fr.utbm.info.ia51.crowdproject.ui
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import io.sarl.lang.core.Address
 import io.sarl.lang.core.Event
 import io.sarl.lang.core.EventListener
+import io.sarl.util.OpenEventSpace
 import java.util.TreeMap
 import java.util.UUID
 import javafx.animation.AnimationTimer
@@ -35,6 +37,7 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
+import fr.utbm.info.ia51.crowdproject.^agent.EndOfSimulation
 
 /** 
  * 
@@ -46,6 +49,8 @@ class FXMLViewerController implements EventListener {
 	var root : AnchorPane
 	val animationTimer : AnimationTimer
 
+	var openSpace : OpenEventSpace
+
 	new(root:AnchorPane) {
 		this.root = root
 		this.animationTimer = new AnimationTimer(){
@@ -55,6 +60,16 @@ class FXMLViewerController implements EventListener {
 				root.children.addAll(shapes.values)
 			}
 		}
+	}
+
+	def setOpenSpace(s : OpenEventSpace) {
+		this.openSpace = s
+	}
+
+	def fireGameOver {
+		var e = new EndOfSimulation
+		e.setSource(new Address(openSpace.spaceID, this.getID))
+		this.openSpace.emit(e)
 	}
 
 	@Override
