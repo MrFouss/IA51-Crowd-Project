@@ -122,6 +122,7 @@ agent Environment {
 			
 			// Change the state of the universe
 			applyActions(this.actions, this.agentBodies)
+			world.update(time)
 
 			if (isTargetReached(agentBodies.values, targetPosition)) {
 				// TODO do something to notify that all hamsters reached the target

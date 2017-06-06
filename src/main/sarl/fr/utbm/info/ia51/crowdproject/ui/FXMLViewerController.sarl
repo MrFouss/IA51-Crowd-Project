@@ -51,8 +51,7 @@ class FXMLViewerController implements EventListener {
 		this.animationTimer = new AnimationTimer(){
 			
 			override handle(now : long) {
-				root.children.removeAll(shapes.values)
-				root.children.addAll(shapes.values)
+				root.children.all = shapes.values
 			}
 		}
 	}

@@ -79,8 +79,8 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
-			
-			// TODO apply all actions
+			agentBody.applyForce(action.linear)
+			agentBody.applyTorque(action.angular)
 		}
 	}
 	
