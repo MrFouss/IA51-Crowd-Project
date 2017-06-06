@@ -152,12 +152,21 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def moveObject(object : MobileBody, motion : MotionQuery) {
 		// TODO
 	}
-	
+
 	/** 
 	 * Updates the physical state of the environment
 	 */
 	def updateEnvironment {
 		world.update(UPDATE_TIME)
+	}
+
+	/**
+	 * Getter of the world
+	 * 
+	 * @return the world instance
+	 */
+	def getWorld : World {
+		return this.world
 	}
 }
 

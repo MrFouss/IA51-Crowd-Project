@@ -24,16 +24,17 @@
 package fr.utbm.info.ia51.crowdproject.^agent
 
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
-import java.util.Map
-import java.util.List
-import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import io.sarl.lang.core.Address
 import java.util.Collection
+import java.util.List
+import java.util.Map
+import java.util.UUID
+import org.dyn4j.dynamics.World
+import org.dyn4j.geometry.Vector2
 
 /** 
  * Capacity to manage the environment
@@ -101,6 +102,13 @@ capacity EnvironmentManager {
 	 * Updates the physical state of the environment
 	 */
 	def updateEnvironment
+
+	/**
+	 * Getter of the world
+	 * 
+	 * @return the world instance
+	 */
+	def getWorld : World
 }
 
 /**
