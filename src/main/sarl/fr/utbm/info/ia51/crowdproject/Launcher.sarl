@@ -27,6 +27,7 @@ import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.janusproject.Boot
+import io.janusproject.util.LoggerCreator
 import java.net.URL
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -34,6 +35,9 @@ import javafx.fxml.JavaFXBuilderFactory
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
+
+import static io.janusproject.Boot.*
+import java.util.logging.Level
 
 class Launcher extends Application {
 	
@@ -63,7 +67,7 @@ class Launcher extends Application {
 		
 		//New controller linked to FXML
 		CONTROLLER = new FXMLViewerController(root)
-
+		Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
 		Boot::startJanus(typeof(Environment),
 						 WIDTH,
 						 HEIGHT,

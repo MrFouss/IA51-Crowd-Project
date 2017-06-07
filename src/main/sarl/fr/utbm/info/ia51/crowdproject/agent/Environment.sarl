@@ -32,13 +32,13 @@ import io.sarl.core.Destroy
 import io.sarl.core.Initialize
 import io.sarl.core.Lifecycle
 import io.sarl.core.Logging
+import io.sarl.util.OpenEventSpace
 import java.util.ArrayList
 import java.util.LinkedList
 import java.util.Random
 import java.util.TreeMap
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
-import io.sarl.util.OpenEventSpace
 
 /**
  * The environment agent, managing all the other agents
@@ -79,12 +79,14 @@ agent Environment {
 			var isDeaf = random.nextBoolean
 			var agentBody = createHamster(if (isDeaf) perceptionDistance else 0, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
-			
+
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
 			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, params)
 		}
 		
+		info("Number of bodies in the world : " + world.bodyCount)
+
 		emit(new FrontEndEnvironmentInitialization(new ArrayList(agentBodies.values)))
 		emit(new RunBeginningOfStep)
 	}
@@ -122,6 +124,7 @@ agent Environment {
 			
 			// Change the state of the universe
 			applyActions(this.actions, this.agentBodies)
+			world.update(time)
 
 			if (isTargetReached(agentBodies.values, targetPosition)) {
 				// TODO do something to notify that all hamsters reached the target
