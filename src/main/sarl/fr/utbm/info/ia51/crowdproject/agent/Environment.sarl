@@ -73,21 +73,20 @@ agent Environment {
 
 		setSkill(new DefaultEnvironmentManager(width, height), typeof(EnvironmentManager))
 		setSkill(new DefaultEnvironmentFrontEnd, typeof(EnvironmentFrontEnd))
-		
+		var actionsList = new ArrayList
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
 			var agentBody = createHamster(if (isDeaf) perceptionDistance else 0, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
-
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
 			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, params)
 		}
-		
 		info("Number of bodies in the world : " + world.bodyCount)
-
 		emit(new FrontEndEnvironmentInitialization(new ArrayList(agentBodies.values)))
+		applyActions(actionsList, agentBodies)
+
 		emit(new RunBeginningOfStep)
 	}
 
@@ -112,7 +111,7 @@ agent Environment {
 			this.actions += occurrence.motion
 			
 			if (this.actions.size >= this.agentBodies.size - 1) {
-				emit(new RunEndOfStep)
+				emit(new RunEndOfStep) [it.isMe]
 			}
 		}
 	}
@@ -133,12 +132,12 @@ agent Environment {
 			
 			// Informs the view that a front end update is needed
 			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
-			
+			Thread.sleep(50)
 			// Increase time value
 			time++
 
 			// Move to next step
-			emit(new RunBeginningOfStep)
+			emit(new RunBeginningOfStep) [it.isMe]
 		}
 	}
 
