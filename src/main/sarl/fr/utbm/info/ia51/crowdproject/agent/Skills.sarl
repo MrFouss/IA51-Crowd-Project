@@ -53,6 +53,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	new (width : float, height : float) {
 		this.world = new World()
 		this.world.gravity = World.ZERO_GRAVITY
+		this.world.settings.stepFrequency = 0.5
 		this.world.setBounds(new AxisAlignedBounds(width, height))
 	}
 	
@@ -82,7 +83,9 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			agentBody.translate(action.linear)
+			//agentBody.applyForce(action.linear)
 			agentBody.rotate(action.angular)
+			//agentBody.applyTorque(action.angular)
 		}
 	}
 	
