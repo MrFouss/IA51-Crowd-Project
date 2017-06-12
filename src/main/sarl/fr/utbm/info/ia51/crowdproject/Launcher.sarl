@@ -29,20 +29,20 @@ import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.janusproject.Boot
 import io.janusproject.util.LoggerCreator
 import java.net.URL
+import java.util.logging.Level
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.fxml.JavaFXBuilderFactory
 import javafx.scene.Scene
-import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 
 import static io.janusproject.Boot.*
-import java.util.logging.Level
 
 class Launcher extends Application {
 	
-	public static val WIDTH = 100.0f
-	public static val HEIGHT = 100.0f
+	public static val WIDTH = 800.0f
+	public static val HEIGHT = 600.0f
 	
 	public static val NB_HAMSTERS = 10
 	public static val PERCEPTION_DISTANCE = 15.0f
@@ -63,11 +63,11 @@ class Launcher extends Application {
 		//FXML to improve with options
 		var location : URL = getClass().getResource("view/FXApplication.fxml")
 		loader = new FXMLLoader()
-		var root : AnchorPane = loader.load(location.openStream()) as AnchorPane
-		
-		//New controller linked to FXML
+		var root : BorderPane = loader.load(location.openStream()) as BorderPane
 		CONTROLLER = new FXMLViewerController(root)
-		Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+
+		//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+
 		Boot::startJanus(typeof(Environment),
 						 WIDTH,
 						 HEIGHT,
