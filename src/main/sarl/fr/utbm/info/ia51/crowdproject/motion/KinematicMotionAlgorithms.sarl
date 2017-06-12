@@ -23,8 +23,8 @@
  */
 package fr.utbm.info.ia51.crowdproject.motion
 
-import java.util.UUID
 import org.dyn4j.geometry.Vector2
+import java.util.UUID
 
 /** 
  * 
@@ -34,36 +34,11 @@ class KinematicWanderAlgorithm implements WanderAlgorithm {
 	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
 		var l = Vector2.create(MAX_SPEED, orientation)
 		var a = Math.random - Math.random
-		//System.err.println(a)
-		//println("from run : " + currentPosition.x)
+		// println("from run : " + currentPosition.x)
 		return new MotionQuery(emitter, MotionBehavior::KINEMATIC) => [
 			linear = l
 			angular = a as float
-			//println("from motion : " + linear.XComponent)
-		]
-	}
-}
-
-/** 
- * 
- */
-class SteeringWanderAlgorithm implements WanderAlgorithm {
-
-	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
-		/* Calculate the circle center */
-		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
-
-		/* Calculate the displacement and its angle */
-		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
-		var wanderingAngle = Math.random - Math.random
-		displacement.rotate(wanderingAngle)
-
-		/* Calculate the wandering force and change the speed */
-		var wanderingForce = center.add(displacement)
-		wanderingForce.magnitude = MAX_SPEED
-
-		return new MotionQuery(emitter, MotionBehavior::STEERING) => [
-			linear = wanderingForce
+			// println("from motion : " + linear.XComponent)
 		]
 	}
 }
