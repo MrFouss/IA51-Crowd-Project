@@ -131,7 +131,7 @@ class FXMLViewerController implements EventListener {
 				// the object needs to be translated in order to center the figure
 				return new Rectangle(
 					object.worldCenter.x-g.width/2,
-					object.worldCenter.y-g.width/2,
+					object.worldCenter.y-g.height/2,
 					g.width,
 					g.height)
 

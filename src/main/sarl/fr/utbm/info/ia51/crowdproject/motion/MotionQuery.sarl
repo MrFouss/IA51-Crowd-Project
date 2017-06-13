@@ -39,6 +39,13 @@ class MotionQuery {
 		this.emitter = emitter
 		this.motionBehavior = motionBehavior
 	}
+
+	new (emitter : UUID, motionBehavior : MotionBehavior, linear : Vector2, angular : float) {
+		this.emitter = emitter
+		this.motionBehavior = motionBehavior
+		this.linear = linear
+		this.angular = angular
+	}
 	
 	new (toCopy : MotionQuery) {
 		this.emitter = toCopy.emitter

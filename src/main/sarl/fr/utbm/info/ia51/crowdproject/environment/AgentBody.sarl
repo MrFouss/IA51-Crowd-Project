@@ -27,33 +27,39 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.MassType
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	val agentId : UUID
 	val perceptionDistance : float
 	val isDeaf : boolean
+	val motionBehavior : MotionBehavior
 
 	new (shape : Convex,
 			perceptionDistance : float,
 			isDeaf : boolean,
-			agentId : UUID) {
-		super(shape, MassType.NORMAL)
+			agentId : UUID,
+			motionBehavior : MotionBehavior) {
+		super(shape)
 		this.perceptionDistance = perceptionDistance
 		this.isDeaf = isDeaf
 		this.agentId = agentId
+		this.motionBehavior = motionBehavior
 	}
 
 	new (shape : Convex,
 			position : Vector2,
 			perceptionDistance : float,
 			isDeaf : boolean,
-			agentId : UUID) {
-		super(shape, MassType.NORMAL)
+			agentId : UUID,
+			motionBehavior : MotionBehavior) {
+		super(shape)
 		this.translate(position)
 		this.perceptionDistance = perceptionDistance
 		this.isDeaf = isDeaf
 		this.agentId = agentId
+		this.motionBehavior = motionBehavior
 	}
 	
 	def getAgentId : UUID {
@@ -68,4 +74,44 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		}
 		return this.agentId.compareTo(o.agentId)
 	}
+	
+	def getMotionBehavior : MotionBehavior {
+		return this.motionBehavior
+	}
+	
+	/**
+	 * Returns the right max linear value, according to the motion behavior
+	 */
+	def getMaxLinear : float {
+		switch (this.motionBehavior) {
+			case KINEMATIC:
+				getMaxLinearVelocity
+			case STEERING:
+				getMaxLinearAcceleration
+			default:
+				throw new EnumConstantNotPresentException(MotionBehavior, "Motion behavior not yet supported")
+		}
+	}
+
+	/**
+	 * Returns the right max angular value, according to the motion behavior
+	 */
+	def getMaxAngular : float {
+		switch (this.motionBehavior) {
+			case KINEMATIC:
+				getMaxAngularVelocity
+			case STEERING:
+				getMaxAngularAcceleration
+			default:
+				throw new EnumConstantNotPresentException(MotionBehavior, "Motion behavior not yet supported")
+		}
+	}
+	
+	abstract def getMaxLinearVelocity : float
+
+	abstract def getMaxLinearAcceleration: float
+
+	abstract def getMaxAngularVelocity : float
+
+	abstract def getMaxAngularAcceleration: float
 }

@@ -35,6 +35,7 @@ import java.util.Map
 import java.util.UUID
 import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 
 /** 
  * Capacity to manage the environment
@@ -44,10 +45,11 @@ capacity EnvironmentManager {
 	/** 
 	 * Creates a hamster's body in the world
 	 * 
+	 * @param motionBehavior the world's motionBehavior
 	 * @param perceptionDistance the distance of perception of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(perceptionDistance : float, isDeaf : boolean) : HamsterBody
+	def createHamster(motionBehavior : MotionBehavior, perceptionDistance : float, isDeaf : boolean) : HamsterBody
 	
 	/** 
 	 * Apply the list of actions
@@ -119,17 +121,15 @@ capacity EnvironmentFrontEnd {
 		 * Sends a list of perceived objects to an agent
 		 * 
 		 * @param agentId the identifier of the agent
+		 * @param agentBody the agent's body
 		 * @param time the time at which the perception is sent
-		 * @param perceivedObjects the list of perceived objects
-		 * @param position current position of the agent's body
-		 * @param orientation current orientation the agent's body is facing
+		 * @param perceivedObjects the list of perceived object
 		 */
 	def sendPerceptions(
 		agentId : UUID,
+		agentBody : AgentBody,
 		time : long,
-		perceivedObjects : List<EnvironmentBody>,
-		position : Vector2,
-		orientation : double)
+		perceivedObjects : List<EnvironmentBody>)
 }
 
 /**

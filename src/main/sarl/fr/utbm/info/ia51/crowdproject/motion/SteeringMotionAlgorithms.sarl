@@ -31,22 +31,28 @@ import org.dyn4j.geometry.Vector2
  */
 class SteeringWanderAlgorithm implements WanderAlgorithm {
 
-	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
-				/* Calculate the circle center
-			 */
-		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
-		/* Calculate the displacement and its angle
-		 */
-		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
-		var wanderingAngle = Math.random - Math.random
-		displacement.rotate(wanderingAngle)
-		/* Calculate the wandering force and change the speed
-		 */
-		var wanderingForce = center.add(displacement)
-		wanderingForce.magnitude = MAX_SPEED
+	val WANDER_CIRCLE_DISTANCE = 2.0f
+	val WANDER_CIRCLE_RADIUS = 1.0f
 
-		return new MotionQuery(emitter, MotionBehavior::STEERING) => [
-			linear = wanderingForce
-		]
+	override run(emitter : UUID,
+		currentPosition : Vector2,
+		orientation : double,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+		
+		// Calculate the circle center
+		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
+		
+		// Calculate the displacement and its angle
+		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
+		var angle = ((Math.random - Math.random) * Math.PI) as float
+		displacement.rotate(angle)
+		
+		// Calculate the wandering force and change the speed
+		var linearVector = center.add(displacement)
+		linearVector.magnitude = maxLinear / 2.0f
+
+		return new MotionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
 	}
 }

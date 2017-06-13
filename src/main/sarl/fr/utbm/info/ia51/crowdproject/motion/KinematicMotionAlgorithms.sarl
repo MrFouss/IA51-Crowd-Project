@@ -31,14 +31,15 @@ import java.util.UUID
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
 
-	override run(emitter : UUID, currentPosition : Vector2, orientation : double) : MotionQuery {
-		var l = Vector2.create(MAX_SPEED, orientation)
-		var a = Math.random - Math.random
-		// println("from run : " + currentPosition.x)
-		return new MotionQuery(emitter, MotionBehavior::KINEMATIC) => [
-			linear = l
-			angular = a as float
-			// println("from motion : " + linear.XComponent)
-		]
+	override run(emitter : UUID,
+		currentPosition : Vector2,
+		orientation : double,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+		
+		var velocity = Vector2.create(maxLinear/2.0f, orientation)
+		var angle = Math.min((Math.random - Math.random) * Math.PI / 2.0f, maxAngular) as float
+		return new MotionQuery(emitter, MotionBehavior::KINEMATIC, velocity, angle)
 	}
 }

@@ -40,6 +40,8 @@ import org.dyn4j.collision.AxisAlignedBounds
 import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import org.dyn4j.geometry.MassType
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -53,22 +55,27 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	new (width : float, height : float) {
 		this.world = new World()
 		this.world.gravity = World.ZERO_GRAVITY
-		this.world.settings.stepFrequency = 0.5
+		this.world.settings.stepFrequency = 1.0f/60.0f
 		this.world.setBounds(new AxisAlignedBounds(width, height))
 	}
 	
 	/** 
 	 * Creates a hamster's body in the world
 	 * 
+	 * @param motionBehavior the world's motion behavior
 	 * @param perceptionDistance the distance of perception of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(perceptionDistance : float, isDeaf : boolean) : HamsterBody {
-		val body = new HamsterBody(Geometry.createCircle(30.0f),
+	def createHamster(motionBehavior : MotionBehavior, perceptionDistance : float, isDeaf : boolean) : HamsterBody {
+		val body = new HamsterBody(
+			Geometry.createCircle(5.0f),
 			perceptionDistance,
 			isDeaf,
-			UUID::randomUUID)
-		body.translate(Math.random * 800, Math.random * 600)
+			UUID::randomUUID,
+			motionBehavior
+		)
+		body.translate(Math.random * 600 + 100, Math.random * 400 + 100)
+		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
 		return body
 	}
@@ -82,10 +89,18 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
-			agentBody.translate(action.linear)
-			//agentBody.applyForce(action.linear)
-			agentBody.rotate(action.angular)
-			//agentBody.applyTorque(action.angular)
+			
+			System.err.println("[" + agentBody.position.x + " ; " + agentBody.position.y + "] ; " + agentBody.orientation)
+			
+			if(agentBody.motionBehavior == MotionBehavior::KINEMATIC) {
+				agentBody.setLinearVelocity(action.linear)
+				agentBody.setAngularVelocity(action.angular)
+			} else if (agentBody.motionBehavior == MotionBehavior::STEERING) {
+				agentBody.applyForce(action.linear)
+				agentBody.applyTorque(action.angular)
+			} else {
+				throw new EnumConstantNotPresentException(MotionBehavior, "")
+			}
 		}
 	}
 	
@@ -183,13 +198,12 @@ skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
 	 * Sends a list of perceived objects to an agent
 	 * 
 	 * @param agentId the identifier of the agent
+	 * @param agentBody the agent's body
 	 * @param time the time at which the perception is sent
 	 * @param perceivedObjects the list of perceived objects
-	 * @param position current position of the agent's body
-	 * @param orientation current orientation the agent's body is facing
 	 */
-	def sendPerceptions(agentId : UUID, time : long, perceivedObjects : List<EnvironmentBody>, position : Vector2, orientation : double) {
-		emit(new Perception(agentId, time, perceivedObjects, position, orientation))
+	def sendPerceptions(agentId : UUID, agentBody : AgentBody, time : long, perceivedObjects : List<EnvironmentBody>) {
+		emit(new Perception(agentId, agentBody, time, perceivedObjects))
 			[it == new Address(defaultSpace.spaceID, agentId)]
 	}
 }
