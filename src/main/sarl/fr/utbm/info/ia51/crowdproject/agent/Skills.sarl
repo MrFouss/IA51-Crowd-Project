@@ -41,7 +41,6 @@ import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import org.dyn4j.geometry.MassType
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -74,7 +73,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 			UUID::randomUUID,
 			motionBehavior
 		)
-		body.translate(Math.random * 600 + 100, Math.random * 400 + 100)
+		body.translate(Math.random * 600 - 300, Math.random * 400 - 200)
 		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
 		return body
@@ -90,7 +89,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			
-			System.err.println("[" + agentBody.position.x + " ; " + agentBody.position.y + "] ; " + agentBody.orientation)
+//			getSkill(typeof(Logging)).info("[" + agentBody.position.x + " ; " + agentBody.position.y + "] ; " + agentBody.orientation)
 			
 			if(agentBody.motionBehavior == MotionBehavior::KINEMATIC) {
 				agentBody.setLinearVelocity(action.linear)

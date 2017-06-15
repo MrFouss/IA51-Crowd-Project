@@ -111,7 +111,6 @@ agent Environment {
 
 	on RunBeginningOfStep {
 		synchronized (this) {
-			this.actions.clear
 
 			for (e : getPerceptions(agentBodies.values).entrySet) {
 				val agentId = e.key.agentId
@@ -120,12 +119,14 @@ agent Environment {
 		}
 	}
 	
-	on Action [it.time == this.time] {
+	on Action [occurrence.time >= this.time] {
 		synchronized (this) {
 			this.actions += occurrence.motion
 			
-			if (this.actions.size >= this.agentBodies.size - 1) {
-				emit(new RunEndOfStep) [it.isMe]
+			if (this.actions.size == this.agentBodies.size) {
+				val actionsToApply = new LinkedList(actions)
+				this.actions.clear
+				emit(new RunEndOfStep(actionsToApply)) [it.isMe]
 			}
 		}
 	}
@@ -136,11 +137,11 @@ agent Environment {
 			// actions += ...
 			
 			// Change the state of the universe
-			applyActions(this.actions, this.agentBodies)
+			applyActions(occurrence.actionsToApply, this.agentBodies)
 
 			val thisNanoTime = System.nanoTime
 			val timeDiff = thisNanoTime - this.lastNanoTime
-        	this.lastNanoTime = thisNanoTime
+			this.lastNanoTime = thisNanoTime
 			world.update(timeDiff / 1.0e9)
 
 			if (isTargetReached(agentBodies.values, targetPosition)) {
@@ -169,28 +170,28 @@ agent Environment {
 		// Spawn top wall
 		val topWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
 		topWall.getFixture(0).setRestitution(0.5)
-		topWall.translate(width / 2, 3)
+		topWall.translate(0, -height/2 + 3)
 		world.addBody(topWall)
 		this.staticBodies += topWall
 
 		// Spawn bottom wall
 		val bottomWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
 		bottomWall.getFixture(0).setRestitution(0.5)
-		bottomWall.translate(width / 2, height - 3)
+		bottomWall.translate(0, height / 2 - 3)
 		world.addBody(bottomWall)
 		this.staticBodies += bottomWall
 
 		// Spawn left wall
 		val leftWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		leftWall.getFixture(0).setRestitution(0.5)
-		leftWall.translate(3, height / 2)
+		leftWall.translate(-width/2 + 3, 0)
 		world.addBody(leftWall)
 		this.staticBodies += leftWall
 
 		// Spawn right wall
 		val rightWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		rightWall.getFixture(0).setRestitution(0.5)
-		rightWall.translate(width - 3, height / 2)
+		rightWall.translate(width/2 - 3, 0)
 		world.addBody(rightWall)
 		this.staticBodies += rightWall
 	}

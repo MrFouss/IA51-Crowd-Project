@@ -40,7 +40,7 @@ class Launcher extends Application {
 	public static val WIDTH = 800.0f
 	public static val HEIGHT = 600.0f
 	
-	public static val NB_HAMSTERS = 1
+	public static val NB_HAMSTERS = 10
 	public static val PERCEPTION_DISTANCE = 15.0f
 	
 	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
@@ -60,9 +60,9 @@ class Launcher extends Application {
 		var location : URL = getClass().getResource("view/FXApplication.fxml")
 		loader = new FXMLLoader()
 		var root : BorderPane = loader.load(location.openStream()) as BorderPane
-		CONTROLLER = new FXMLViewerController(root)
+		CONTROLLER = new FXMLViewerController(root, WIDTH, HEIGHT)
 
-		//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+//		Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
 
 		Boot::startJanus(typeof(Environment),
 						 WIDTH,

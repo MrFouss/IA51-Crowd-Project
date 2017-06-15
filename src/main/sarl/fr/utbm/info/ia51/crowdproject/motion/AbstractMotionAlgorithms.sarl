@@ -27,13 +27,30 @@ import java.util.UUID
 import org.dyn4j.geometry.Vector2
 
 /** 
- * 
+ * Abstract definition of the wandering motion behavior
  */
 interface WanderAlgorithm {
 
 	def run(emitter : UUID,
-		currentPosition : Vector2,
 		orientation : double,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery
+
+}
+
+/** 
+ * Abstract definition of the seeking motion behavior
+ */
+interface SeekAlgorithm {
+
+	val SLOW_DOWN_DISTANCE = 50.0f
+	val SLOW_DOWN_ANGLE = Math.PI / 4
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetPosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
 	) : MotionQuery
