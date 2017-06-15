@@ -28,13 +28,15 @@ import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.sarl.core.Lifecycle
 import java.util.UUID
 import java.util.List
+import io.sarl.core.Destroy
+import io.sarl.core.Logging
 
 /**
  * Abstract representation of an animat
  */
 abstract agent Animat {
 	
-	uses Lifecycle
+	uses Lifecycle, Logging
 	
 	var agentId : UUID
 	var motionBehavior : MotionBehavior
@@ -50,6 +52,10 @@ abstract agent Animat {
 	
 	on EndOfSimulation {
 		killMe
+	}
+
+	on Destroy {
+		info("End of the simulation. Killing the agent.")
 	}
 
 	protected def getAgentId : UUID {

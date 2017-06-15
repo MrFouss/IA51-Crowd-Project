@@ -27,7 +27,7 @@ import java.util.UUID
 import org.dyn4j.geometry.Vector2
 
 /** 
- * 
+ * Steering implementation of the wandering motion behavior
  */
 class SteeringWanderAlgorithm implements WanderAlgorithm {
 
@@ -35,7 +35,6 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 	val WANDER_CIRCLE_RADIUS = 1.0f
 
 	override run(emitter : UUID,
-		currentPosition : Vector2,
 		orientation : double,
 		maxLinear : float,
 		maxAngular : float
@@ -55,4 +54,22 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 
 		return new MotionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
 	}
+}
+
+/** 
+ * Steering implementation of the seeking motion behavior
+ */
+class SteeringSeekAlgorithm implements SeekAlgorithm {
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetRelativePosition : Vector2,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+		
+		
+	}
+
 }

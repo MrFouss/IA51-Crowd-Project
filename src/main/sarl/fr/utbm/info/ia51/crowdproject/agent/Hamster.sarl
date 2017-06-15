@@ -31,6 +31,9 @@ import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
 import io.sarl.core.Destroy
 import io.sarl.core.Logging
 import java.util.List
+import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
 
 /**
  * The hamster agent
@@ -38,6 +41,7 @@ import java.util.List
 agent Hamster extends Animat {
 
 	var wanderBehavior : WanderAlgorithm
+	var seekBehavior : SeekAlgorithm
 
 	uses Logging, EnvironmentMotion
 	
@@ -49,8 +53,10 @@ agent Hamster extends Animat {
 		
 		if (this.motionBehavior == MotionBehavior::KINEMATIC) {
 			this.wanderBehavior = new KinematicWanderAlgorithm
+			this.seekBehavior = new KinematicSeekAlgorithm
 		} else if (this.motionBehavior == MotionBehavior::STEERING) {
 			this.wanderBehavior = new SteeringWanderAlgorithm
+			this.seekBehavior = new SteeringSeekAlgorithm
 		}
 	}
 
@@ -63,17 +69,22 @@ agent Hamster extends Animat {
 			var computedMotion : MotionQuery
 			
 			// If the target has been perceived
-//			if (target !== null) {
-//				// TODO
-//			} else {
+			if (occurrence.agentBody.position.to(0.0, 0.0).magnitude < 100.0f) {
+				computedMotion = this.seekBehavior.run(
+				occurrence.agentId,
+				occurrence.agentBody.orientation,
+				occurrence.agentBody.position.to(0.0, 0.0),
+				occurrence.agentBody.maxLinear,
+				occurrence.agentBody.maxAngular
+				)
+			} else {
 				computedMotion = this.wanderBehavior.run(
-					occurrence.agentId, 
-					occurrence.agentBody.position,
+					occurrence.agentId,
 					occurrence.agentBody.orientation,
 					occurrence.agentBody.maxLinear,
 					occurrence.agentBody.maxAngular
 				)
-//			}
+			}
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
 		}

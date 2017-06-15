@@ -27,19 +27,49 @@ import org.dyn4j.geometry.Vector2
 import java.util.UUID
 
 /** 
- * 
+ * Kinematic implementation of the wandering motion behavior
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
 
 	override run(emitter : UUID,
-		currentPosition : Vector2,
 		orientation : double,
 		maxLinear : float,
 		maxAngular : float
 	) : MotionQuery {
 		
-		var velocity = Vector2.create(maxLinear/2.0f, orientation)
-		var angle = Math.min((Math.random - Math.random) * Math.PI / 2.0f, maxAngular) as float
+		var velocity = Vector2.create(maxLinear * 0.75f, orientation)
+		var angle = ((Math.random - Math.random) * maxAngular) as float
 		return new MotionQuery(emitter, MotionBehavior::KINEMATIC, velocity, angle)
+	}
+}
+
+/** 
+ * Kinematic implementation of the seeking motion behavior
+ */
+class KinematicSeekAlgorithm implements SeekAlgorithm {
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetRelativePosition : Vector2,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+		
+		val currentVelocityVector = Vector2.create(1.0f, orientation)
+		val angleBetweenVectors = currentVelocityVector.getAngleBetween(targetRelativePosition)
+		val linearSpeed = maxLinear * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
+		val linearVelocity = Vector2.create(linearSpeed, orientation)
+		
+		if (targetRelativePosition.magnitude <= SLOW_DOWN_DISTANCE)
+			linearVelocity.magnitude = linearVelocity.magnitude * (1- ((SLOW_DOWN_DISTANCE - targetRelativePosition.magnitude) / SLOW_DOWN_DISTANCE))
+
+		var angularVelocity : float		
+		if (Math.abs(angleBetweenVectors) <= SLOW_DOWN_ANGLE)
+			angularVelocity = (angleBetweenVectors * maxAngular / SLOW_DOWN_ANGLE) as float
+		else
+			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
+
+		return new MotionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
 }

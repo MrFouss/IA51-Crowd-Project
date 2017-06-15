@@ -73,7 +73,14 @@ event RunBeginningOfStep
 /**
  * Event called at the end of a step
  */
-event RunEndOfStep
+event RunEndOfStep {
+	
+	var actionsToApply : List<MotionQuery>
+	
+	new (actionsToApply : List<MotionQuery>) {
+		this.actionsToApply = actionsToApply
+	}
+}
 
 /**
  * Event called at the end of the simulation

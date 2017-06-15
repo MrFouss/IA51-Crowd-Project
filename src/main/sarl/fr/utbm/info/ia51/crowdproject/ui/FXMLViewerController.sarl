@@ -53,9 +53,12 @@ class FXMLViewerController implements EventListener {
 
 	var openSpace : OpenEventSpace
 
+	val worldWidth : float
+	val worldHeight : float
+
 	var index = 0
 
-	new(root:BorderPane) {
+	new(root : BorderPane, worldWidth : float, worldHeight : float) {
 		this.root = root
 		this.animationTimer = new AnimationTimer(){
 			
@@ -63,6 +66,8 @@ class FXMLViewerController implements EventListener {
 				root.children.all = shapes
 			}
 		}
+		this.worldWidth = worldWidth
+		this.worldHeight = worldHeight
 	}
 
 	def setOpenSpace(s : OpenEventSpace) {
@@ -121,8 +126,8 @@ class FXMLViewerController implements EventListener {
 			if(geometry.shape instanceof Circle) {
 				var g = geometry.shape as Circle
 				return new javafx.scene.shape.Circle(
-					object.worldCenter.x,
-					object.worldCenter.y,
+					object.worldCenter.x + worldWidth/2,
+					object.worldCenter.y + worldHeight / 2,
 					g.radius)
 
 			} else if(geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
@@ -130,8 +135,8 @@ class FXMLViewerController implements EventListener {
 
 				// the object needs to be translated in order to center the figure
 				return new Rectangle(
-					object.worldCenter.x-g.width/2,
-					object.worldCenter.y-g.height/2,
+					object.worldCenter.x - g.width / 2 + worldWidth / 2,
+					object.worldCenter.y - g.height / 2 + worldHeight / 2,
 					g.width,
 					g.height)
 
@@ -140,7 +145,6 @@ class FXMLViewerController implements EventListener {
 			}
 		}
 	}
-
 
 	/** 
 	 * Used to transform the JavaFx shapes from dyn4j shapes
@@ -152,14 +156,14 @@ class FXMLViewerController implements EventListener {
 		for (geometry as BodyFixture : object.fixtures) {
 			if (geometry.shape instanceof Circle) {
 				var s = shape as javafx.scene.shape.Circle
-				s.translateX = object.worldCenter.x - s.centerX
-				s.translateY = object.worldCenter.y - s.centerY
+				s.translateX = object.worldCenter.x - s.centerX + worldWidth / 2
+				s.translateY = object.worldCenter.y - s.centerY + worldHeight / 2
 				s.rotate = object.orientation
 			} else if (geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
 				var g = geometry.shape as org.dyn4j.geometry.Rectangle
 				var s = shape as Rectangle
-				s.x = object.worldCenter.x - g.width / 2
-				s.y = object.worldCenter.y
+				s.x = object.worldCenter.x - g.width / 2 + worldWidth / 2
+				s.y = object.worldCenter.y + worldHeight / 2
 				s.rotate = object.orientation
 			}
 		}
