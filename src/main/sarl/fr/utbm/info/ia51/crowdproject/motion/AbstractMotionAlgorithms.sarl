@@ -36,7 +36,6 @@ interface WanderAlgorithm {
 		maxLinear : float,
 		maxAngular : float
 	) : MotionQuery
-
 }
 
 /** 
@@ -54,5 +53,20 @@ interface SeekAlgorithm {
 		maxLinear : float,
 		maxAngular : float
 	) : MotionQuery
+}
 
+/** 
+ * Abstract definition of the fleeing motion behavior
+ */
+interface FleeAlgorithm {
+
+	val SLOW_DOWN_ANGLE = Math.PI / 4
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetPosition : Vector2,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery
 }

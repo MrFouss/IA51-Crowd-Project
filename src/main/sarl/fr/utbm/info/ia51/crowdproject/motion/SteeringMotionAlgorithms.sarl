@@ -71,5 +71,19 @@ class SteeringSeekAlgorithm implements SeekAlgorithm {
 		
 		
 	}
+}
 
+/** 
+ * Steering implementation of the fleeing motion behavior
+ */
+class SteeringFleeAlgorithm implements FleeAlgorithm {
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetRelativePosition : Vector2,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+	}
 }
