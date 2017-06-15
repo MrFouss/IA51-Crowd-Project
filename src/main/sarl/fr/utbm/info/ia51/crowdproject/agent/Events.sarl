@@ -29,6 +29,7 @@ import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import java.util.List
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 
 /**
  * A perception for an agent
@@ -36,17 +37,15 @@ import org.dyn4j.geometry.Vector2
 event Perception {
 
 	val agentId : UUID
+	val agentBody : AgentBody
 	val time : long
 	val objects : List<EnvironmentBody>
-	val position : Vector2
-	val orientation : double
 
-	new (agentId : UUID, time : long, objects : List<EnvironmentBody>, position : Vector2, orientation : double) {
+	new (agentId : UUID, agentBody : AgentBody, time : long, objects : List<EnvironmentBody>) {
 		this.agentId = agentId
+		this.agentBody = agentBody
 		this.time = time
 		this.objects = objects
-		this.position = position
-		this.orientation = orientation
 	}
 }
 
@@ -74,7 +73,14 @@ event RunBeginningOfStep
 /**
  * Event called at the end of a step
  */
-event RunEndOfStep
+event RunEndOfStep {
+	
+	var actionsToApply : List<MotionQuery>
+	
+	new (actionsToApply : List<MotionQuery>) {
+		this.actionsToApply = actionsToApply
+	}
+}
 
 /**
  * Event called at the end of the simulation

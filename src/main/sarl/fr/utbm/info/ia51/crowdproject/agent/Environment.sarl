@@ -39,6 +39,10 @@ import java.util.Random
 import java.util.TreeMap
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
+import org.dyn4j.geometry.Geometry
+import fr.utbm.info.ia51.crowdproject.environment.StaticBody
+import java.awt.Color
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 
 /**
  * The environment agent, managing all the other agents
@@ -47,13 +51,15 @@ agent Environment {
 	
 	uses Logging, Lifecycle, DefaultContextInteractions, EnvironmentManager, EnvironmentFrontEnd
 
-	val agentBodies = new TreeMap<UUID, AgentBody> 
+	val agentBodies = new TreeMap<UUID, AgentBody>
+	val staticBodies = new LinkedList<StaticBody>
 	val actions = new LinkedList<MotionQuery>
 	var targetPosition : Vector2
 
 	var motionBehavior : MotionBehavior
 	var time = 0 as long
 	val random = new Random
+	var lastNanoTime : long
 
 	on Initialize {
 
@@ -63,6 +69,7 @@ agent Environment {
 		var perceptionDistance = occurrence.parameters.get(3) as Float
 		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
 		var controller = occurrence.parameters.get(5) as FXMLViewerController
+		lastNanoTime = System.nanoTime()
 
 		// Communication from environment to UI
 		(defaultSpace as OpenEventSpace).register(controller)
@@ -73,21 +80,29 @@ agent Environment {
 
 		setSkill(new DefaultEnvironmentManager(width, height), typeof(EnvironmentManager))
 		setSkill(new DefaultEnvironmentFrontEnd, typeof(EnvironmentFrontEnd))
+		
+		initializeStaticBodies(width, height)
+		
 		var actionsList = new ArrayList
+		
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
-			var agentBody = createHamster(if (isDeaf) perceptionDistance else 0, isDeaf)
+			var agentBody = createHamster(motionBehavior, if (isDeaf) perceptionDistance else 0, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
 			spawnInContextWithID(typeof(Hamster), agentBody.agentId, defaultContext, params)
 		}
-		info("Number of bodies in the world : " + world.bodyCount)
-		emit(new FrontEndEnvironmentInitialization(new ArrayList(agentBodies.values)))
-		applyActions(actionsList, agentBodies)
-
-		emit(new RunBeginningOfStep)
+		
+		info("Number of bodies in the world: " + world.bodyCount)
+		
+		val totalListOfBodies = new ArrayList<EnvironmentBody>
+		totalListOfBodies += agentBodies.values
+		totalListOfBodies += staticBodies
+		emit(new FrontEndEnvironmentInitialization(totalListOfBodies))
+		
+		emit(new RunBeginningOfStep) [it.isMe]
 	}
 
 	on Destroy {
@@ -95,23 +110,23 @@ agent Environment {
 	}
 
 	on RunBeginningOfStep {
-		info("Beginning of a new step")
 		synchronized (this) {
-			this.actions.clear
 
 			for (e : getPerceptions(agentBodies.values).entrySet) {
 				val agentId = e.key.agentId
-				sendPerceptions(agentId, this.time, e.value, e.key.position, e.key.orientation)
+				sendPerceptions(agentId, e.key, this.time, e.value)
 			}
 		}
 	}
 	
-	on Action [it.time == this.time] {
+	on Action [occurrence.time >= this.time] {
 		synchronized (this) {
 			this.actions += occurrence.motion
 			
-			if (this.actions.size >= this.agentBodies.size - 1) {
-				emit(new RunEndOfStep) [it.isMe]
+			if (this.actions.size == this.agentBodies.size) {
+				val actionsToApply = new LinkedList(actions)
+				this.actions.clear
+				emit(new RunEndOfStep(actionsToApply)) [it.isMe]
 			}
 		}
 	}
@@ -122,8 +137,12 @@ agent Environment {
 			// actions += ...
 			
 			// Change the state of the universe
-			applyActions(this.actions, this.agentBodies)
-			world.update(0.5)
+			applyActions(occurrence.actionsToApply, this.agentBodies)
+
+			val thisNanoTime = System.nanoTime
+			val timeDiff = thisNanoTime - this.lastNanoTime
+			this.lastNanoTime = thisNanoTime
+			world.update(timeDiff / 1.0e9)
 
 			if (isTargetReached(agentBodies.values, targetPosition)) {
 				// TODO do something to notify that all hamsters reached the target
@@ -132,7 +151,8 @@ agent Environment {
 			
 			// Informs the view that a front end update is needed
 			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
-			Thread.sleep(50)
+			Thread.sleep(100/6)
+			
 			// Increase time value
 			time++
 
@@ -143,5 +163,36 @@ agent Environment {
 
 	on EndOfSimulation {
 		killMe
+	}
+	
+	private def initializeStaticBodies(width : float, height : float) {
+		
+		// Spawn top wall
+		val topWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
+		topWall.getFixture(0).setRestitution(0.5)
+		topWall.translate(0, -height/2 + 3)
+		world.addBody(topWall)
+		this.staticBodies += topWall
+
+		// Spawn bottom wall
+		val bottomWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
+		bottomWall.getFixture(0).setRestitution(0.5)
+		bottomWall.translate(0, height / 2 - 3)
+		world.addBody(bottomWall)
+		this.staticBodies += bottomWall
+
+		// Spawn left wall
+		val leftWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
+		leftWall.getFixture(0).setRestitution(0.5)
+		leftWall.translate(-width/2 + 3, 0)
+		world.addBody(leftWall)
+		this.staticBodies += leftWall
+
+		// Spawn right wall
+		val rightWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
+		rightWall.getFixture(0).setRestitution(0.5)
+		rightWall.translate(width/2 - 3, 0)
+		world.addBody(rightWall)
+		this.staticBodies += rightWall
 	}
 }

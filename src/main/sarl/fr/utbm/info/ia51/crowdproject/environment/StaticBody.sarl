@@ -23,7 +23,20 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
+import org.dyn4j.geometry.MassType
+import org.dyn4j.geometry.Convex
+import java.awt.Color
+
 /** 
  * 
  */
-abstract class StaticBody extends EnvironmentBody {}
+class StaticBody extends EnvironmentBody {
+	
+	new (shape : Convex) {
+		super(shape, MassType.INFINITE)
+	}
+
+	new (shape : Convex, color : Color) {
+		super(shape, MassType.INFINITE, color)
+	}
+}

@@ -27,46 +27,63 @@ import java.util.UUID
 import org.dyn4j.geometry.Vector2
 
 /** 
- * Abstract definition of the wandering motion behavior
+ * Steering implementation of the wandering motion behavior
  */
-interface WanderAlgorithm {
+class SteeringWanderAlgorithm implements WanderAlgorithm {
 
-	def run(emitter : UUID,
+	val WANDER_CIRCLE_DISTANCE = 2.0f
+	val WANDER_CIRCLE_RADIUS = 1.0f
+
+	override run(emitter : UUID,
 		orientation : double,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : MotionQuery {
+		
+		// Calculate the circle center
+		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
+		
+		// Calculate the displacement and its angle
+		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
+		var angle = ((Math.random - Math.random) * Math.PI) as float
+		displacement.rotate(angle)
+		
+		// Calculate the wandering force and change the speed
+		var linearVector = center.add(displacement)
+		linearVector.magnitude = maxLinear / 2.0f
+
+		return new MotionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
+	}
 }
 
 /** 
- * Abstract definition of the seeking motion behavior
+ * Steering implementation of the seeking motion behavior
  */
-interface SeekAlgorithm {
-
-	val SLOW_DOWN_DISTANCE = 50.0f
-	val SLOW_DOWN_ANGLE = Math.PI / 4
+class SteeringSeekAlgorithm implements SeekAlgorithm {
 
 	def run(
 		emitter : UUID,
 		orientation : double,
-		targetPosition : Vector2,
+		targetRelativePosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : MotionQuery {
+		
+		
+	}
 }
 
 /** 
- * Abstract definition of the fleeing motion behavior
+ * Steering implementation of the fleeing motion behavior
  */
-interface FleeAlgorithm {
-
-	val SLOW_DOWN_ANGLE = Math.PI / 4
+class SteeringFleeAlgorithm implements FleeAlgorithm {
 
 	def run(
 		emitter : UUID,
 		orientation : double,
-		targetPosition : Vector2,
+		targetRelativePosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : MotionQuery {
+	}
 }
