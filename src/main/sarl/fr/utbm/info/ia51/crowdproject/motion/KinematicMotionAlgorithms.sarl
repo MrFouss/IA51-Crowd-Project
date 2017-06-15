@@ -73,3 +73,32 @@ class KinematicSeekAlgorithm implements SeekAlgorithm {
 		return new MotionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
 }
+/** 
+ * Kinematic implementation of the fleeing motion behavior
+ */
+class KinematicFleeAlgorithm implements FleeAlgorithm {
+
+	def run(
+		emitter : UUID,
+		orientation : double,
+		targetRelativePosition : Vector2,
+		maxLinear : float,
+		maxAngular : float
+	) : MotionQuery {
+		
+		val fleeingVector = targetRelativePosition.negative
+
+		val currentVelocityVector = Vector2.create(1.0f, orientation)
+		val angleBetweenVectors = currentVelocityVector.getAngleBetween(fleeingVector)
+		val linearSpeed = maxLinear * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
+		val linearVelocity = Vector2.create(linearSpeed, orientation)
+
+		var angularVelocity : float
+		if (Math.abs(angleBetweenVectors) <= SLOW_DOWN_ANGLE)
+			angularVelocity = (angleBetweenVectors * maxAngular / SLOW_DOWN_ANGLE) as float
+		else
+			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
+
+		return new MotionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
+	}
+}

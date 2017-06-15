@@ -34,6 +34,9 @@ import java.util.List
 import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
 
 /**
  * The hamster agent
@@ -42,6 +45,7 @@ agent Hamster extends Animat {
 
 	var wanderBehavior : WanderAlgorithm
 	var seekBehavior : SeekAlgorithm
+	var fleeBehavior : FleeAlgorithm
 
 	uses Logging, EnvironmentMotion
 	
@@ -54,9 +58,11 @@ agent Hamster extends Animat {
 		if (this.motionBehavior == MotionBehavior::KINEMATIC) {
 			this.wanderBehavior = new KinematicWanderAlgorithm
 			this.seekBehavior = new KinematicSeekAlgorithm
+			this.fleeBehavior = new KinematicFleeAlgorithm
 		} else if (this.motionBehavior == MotionBehavior::STEERING) {
 			this.wanderBehavior = new SteeringWanderAlgorithm
 			this.seekBehavior = new SteeringSeekAlgorithm
+			this.fleeBehavior = new SteeringFleeAlgorithm
 		}
 	}
 
