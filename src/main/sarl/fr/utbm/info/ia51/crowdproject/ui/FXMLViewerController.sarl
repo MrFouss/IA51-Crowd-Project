@@ -24,18 +24,34 @@
 package fr.utbm.info.ia51.crowdproject.ui
 
 import fr.utbm.info.ia51.crowdproject.^agent.EndOfSimulation
+import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import io.janusproject.Boot
 import io.sarl.lang.core.Address
 import io.sarl.lang.core.Event
 import io.sarl.lang.core.EventListener
 import io.sarl.util.OpenEventSpace
+import java.net.URL
 import java.util.ArrayList
+import java.util.Arrays
+import java.util.Optional
+import java.util.ResourceBundle
 import java.util.UUID
-import javafx.animation.AnimationTimer
+import javafx.fxml.FXML
+import javafx.fxml.Initializable
+import javafx.geometry.Insets
+import javafx.scene.control.ButtonBar.ButtonData
+import javafx.scene.control.ButtonType
+import javafx.scene.control.ComboBox
+import javafx.scene.control.Dialog
+import javafx.scene.control.Label
+import javafx.scene.control.TextField
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import org.dyn4j.dynamics.BodyFixture
@@ -44,31 +60,27 @@ import org.dyn4j.geometry.Circle
 /** 
  * 
  */
-class FXMLViewerController implements EventListener {
+class FXMLViewerController implements Initializable, EventListener {
+
+	public static val WIDTH = 800.0f
+	public static val HEIGHT = 600.0f
+
+	public static val NB_HAMSTERS = 10
+	public static val PERCEPTION_DISTANCE = 15.0f
+
+	public static var motionBehavior = MotionBehavior::KINEMATIC
+	
+	public static var nbHamster : Integer
+
+	@FXML
+	var worldDisplay : BorderPane
 
 	val id = UUID.randomUUID
 	var shapes = new ArrayList<Shape>
-	var root : BorderPane
-	val animationTimer : AnimationTimer
 
 	var openSpace : OpenEventSpace
 
-	val worldWidth : float
-	val worldHeight : float
-
 	var index = 0
-
-	new(root : BorderPane, worldWidth : float, worldHeight : float) {
-		this.root = root
-		this.animationTimer = new AnimationTimer(){
-			
-			override handle(now : long) {
-				root.children.all = shapes
-			}
-		}
-		this.worldWidth = worldWidth
-		this.worldHeight = worldHeight
-	}
 
 	def setOpenSpace(s : OpenEventSpace) {
 		this.openSpace = s
@@ -88,7 +100,6 @@ class FXMLViewerController implements EventListener {
 	@Override
 	override receiveEvent(^event : Event) {
 		synchronized(this) {
-
 			if (^event instanceof FrontEndEnvironmentInitialization) {
 				shapes = new ArrayList
 				^event.objects.forEach [ object |
@@ -97,8 +108,6 @@ class FXMLViewerController implements EventListener {
 					shapes.add(shape)
 					this.index++
 				]
-				this.animationTimer.start
-
 			} else if (^event instanceof FrontEndEnvironmentChange) {
 				^event.objects.forEach [ object |
 					if (shapes.get(object.userData as Integer) === null) {
@@ -112,6 +121,7 @@ class FXMLViewerController implements EventListener {
 					}
 				]
 			}
+			worldDisplay.children.all = shapes
 		}
 	}
 	
@@ -126,8 +136,8 @@ class FXMLViewerController implements EventListener {
 			if(geometry.shape instanceof Circle) {
 				var g = geometry.shape as Circle
 				return new javafx.scene.shape.Circle(
-					object.worldCenter.x + worldWidth/2,
-					object.worldCenter.y + worldHeight / 2,
+					object.worldCenter.x + WIDTH /2,
+					object.worldCenter.y + HEIGHT / 2,
 					g.radius)
 
 			} else if(geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
@@ -135,8 +145,8 @@ class FXMLViewerController implements EventListener {
 
 				// the object needs to be translated in order to center the figure
 				return new Rectangle(
-					object.worldCenter.x - g.width / 2 + worldWidth / 2,
-					object.worldCenter.y - g.height / 2 + worldHeight / 2,
+					object.worldCenter.x - g.width / 2 + WIDTH / 2,
+					object.worldCenter.y - g.height / 2 + HEIGHT / 2,
 					g.width,
 					g.height)
 
@@ -156,18 +166,68 @@ class FXMLViewerController implements EventListener {
 		for (geometry as BodyFixture : object.fixtures) {
 			if (geometry.shape instanceof Circle) {
 				var s = shape as javafx.scene.shape.Circle
-				s.translateX = object.worldCenter.x - s.centerX + worldWidth / 2
-				s.translateY = object.worldCenter.y - s.centerY + worldHeight / 2
+				s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2
+				s.translateY = object.worldCenter.y - s.centerY + HEIGHT / 2
 				s.rotate = object.orientation
 			} else if (geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
 				var g = geometry.shape as org.dyn4j.geometry.Rectangle
 				var s = shape as Rectangle
-				s.x = object.worldCenter.x - g.width / 2 + worldWidth / 2
-				s.y = object.worldCenter.y + worldHeight / 2
+				s.x = object.worldCenter.x - g.width / 2 + WIDTH / 2
+				s.y = object.worldCenter.y + HEIGHT / 2
 				s.rotate = object.orientation
 			}
 		}
 	}
+	
+	override initialize(arg0 : URL, arg1 : ResourceBundle) {
+		var dialog : Dialog<ArrayList<String>> = new Dialog
+		dialog.setTitle("Setup window");
+		dialog.setHeaderText("Choose your configuration");
+
+		var launchButtonType = new ButtonType("Launch Simulation", ButtonData.OK_DONE);
+		dialog.getDialogPane().getButtonTypes().addAll(launchButtonType, ButtonType.CANCEL);
+	
+		var grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+
+		var motionBox = new ComboBox
+		motionBox.items.addAll("Kinematic", "Steering")
+		motionBox.value = "Kinematic"
+		var nbHamsterField = new TextField
+		nbHamsterField.setPromptText(""+NB_HAMSTERS);
+		
+		grid.add(new Label("Type of motion:"), 0, 0);
+		grid.add(motionBox, 1, 0);
+		grid.add(new Label("Number of hamsters:"), 0, 1);
+		grid.add(nbHamsterField, 1, 1);
+
+		dialog.getDialogPane().setContent(grid);
+		
+		// Convert the result to an arraylist when the launch button is clicked.
+		
+		dialog.setResultConverter([dialogButton | 
+		    if (dialogButton == launchButtonType) {
+		        return new ArrayList<String>(Arrays.asList(motionBox.getValue, nbHamsterField.getText));
+		}
+		    return null;
+		]);
+		
+		var result : Optional<ArrayList<String>> = dialog.showAndWait();
+		result.ifPresent([ config |
+			if(config.get(0) == "Kinematic")
+				motionBehavior = MotionBehavior::KINEMATIC
+			else
+				motionBehavior = MotionBehavior::STEERING
+			nbHamster = if(config.get(1) != "") Integer.valueOf(config.get(1)) else NB_HAMSTERS
+			
+			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, PERCEPTION_DISTANCE, motionBehavior,
+				this)
+			//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+		]);
+	}
+	
 }
 
 class GeometryConversionException extends RuntimeException {
