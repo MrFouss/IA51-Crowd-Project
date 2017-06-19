@@ -100,15 +100,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	@Override
 	override receiveEvent(^event : Event) {
 		synchronized(this) {
-			if (^event instanceof FrontEndEnvironmentInitialization) {
-				shapes = new ArrayList
-				^event.objects.forEach [ object |
-					object.userData = this.index
-					val shape = createShape(object)
-					shapes.add(shape)
-					this.index++
-				]
-			} else if (^event instanceof FrontEndEnvironmentChange) {
+			if (^event instanceof FrontEndEnvironmentChange) {
 				^event.objects.forEach [ object |
 					if (shapes.get(object.userData as Integer) === null) {
 						object.userData = this.index
@@ -119,6 +111,14 @@ class FXMLViewerController implements Initializable, EventListener {
 						val shape = shapes.get(object.userData as Integer)
 						shape.transform(object)
 					}
+				]
+			} else if (^event instanceof FrontEndEnvironmentInitialization) {
+				shapes = new ArrayList
+				^event.objects.forEach [ object |
+					object.userData = this.index
+					val shape = createShape(object)
+					shapes.add(shape)
+					this.index++
 				]
 			}
 			worldDisplay.children.all = shapes
