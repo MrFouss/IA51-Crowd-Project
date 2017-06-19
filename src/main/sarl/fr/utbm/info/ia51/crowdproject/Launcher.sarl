@@ -23,10 +23,7 @@
  */
 package fr.utbm.info.ia51.crowdproject
 
-import fr.utbm.info.ia51.crowdproject.^agent.Environment
-import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
-import io.janusproject.Boot
 import java.net.URL
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -36,18 +33,10 @@ import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 
 class Launcher extends Application {
-	
-	public static val WIDTH = 800.0f
-	public static val HEIGHT = 600.0f
-	
-	public static val NB_HAMSTERS = 10
-	public static val PERCEPTION_DISTANCE = 15.0f
-	
-	public static val MOTION_BEHAVIOR = MotionBehavior::KINEMATIC
-
-	private static var CONTROLLER : FXMLViewerController
 
 	private var loader : FXMLLoader
+	
+	private var controller : FXMLViewerController
 
 	public static def main(args : String[]) {
 		launch(args);
@@ -59,32 +48,22 @@ class Launcher extends Application {
 		//FXML to improve with options
 		var location : URL = getClass().getResource("view/FXApplication.fxml")
 		loader = new FXMLLoader()
-		var root : BorderPane = loader.load(location.openStream()) as BorderPane
-		CONTROLLER = new FXMLViewerController(root, WIDTH, HEIGHT)
-
-//		Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
-
-		Boot::startJanus(typeof(Environment),
-						 WIDTH,
-						 HEIGHT,
-						 NB_HAMSTERS,
-						 PERCEPTION_DISTANCE,
-						 MOTION_BEHAVIOR,
-						 CONTROLLER)
-		
-		loader.controller = CONTROLLER
 		loader.setLocation(location)
 		loader.setBuilderFactory(new JavaFXBuilderFactory())
+
+		var root : BorderPane = loader.load(location.openStream()) as BorderPane
+
 		var scene : Scene = new Scene(root)
 		
 		stage.setTitle("Crowd Project")
 		stage.setScene(scene)
 		stage.show()
+		controller = loader.controller
 	}
 
 	@Override
 	public def stop() throws Exception {
 		super.stop();
-		CONTROLLER.fireGameOver
+		controller.fireGameOver
 	}
 }
