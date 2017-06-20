@@ -53,6 +53,7 @@ agent Environment {
 
 	val agentBodies = new TreeMap<UUID, AgentBody>
 	val staticBodies = new LinkedList<StaticBody>
+	
 	val actions = new LinkedList<MotionQuery>
 	var targetPosition : Vector2
 
@@ -65,15 +66,16 @@ agent Environment {
 		var width = occurrence.parameters.get(0) as Float
 		var height = occurrence.parameters.get(1) as Float
 		var nbHamsters = occurrence.parameters.get(2) as Integer
-		var perceptionDistance = occurrence.parameters.get(3) as Float
-		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
-		var controller = occurrence.parameters.get(5) as FXMLViewerController
+		var frustrumRadius = occurrence.parameters.get(3) as Float
+		var frustrumAngle = occurrence.parameters.get(4) as Float
+		motionBehavior = occurrence.parameters.get(5) as MotionBehavior
+		var controller = occurrence.parameters.get(6) as FXMLViewerController
 
 		// Communication from environment to UI
 		(defaultSpace as OpenEventSpace).register(controller)
 		// Communication from UI to environment
 		controller.openSpace = defaultSpace as OpenEventSpace
-
+		
 		info("Beginning of the simulation. Spawning the environment agent.")
 
 		setSkill(new DefaultEnvironmentManager(width, height), typeof(EnvironmentManager))
@@ -86,7 +88,7 @@ agent Environment {
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
-			var agentBody = createHamster(motionBehavior, if (isDeaf) perceptionDistance else 0, isDeaf)
+			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 1.0f, frustrumAngle, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]

@@ -27,6 +27,8 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import org.dyn4j.geometry.Geometry
+import org.dyn4j.geometry.Slice
 
 /** 
  * Class defining the body of a hamster
@@ -38,13 +40,23 @@ class HamsterBody extends AgentBody {
 	val MAX_ANGULAR_VELOCITY = 30.0f
 	val MAX_ANGULAR_ACCELERATION = 30.0f
 
-	new (shape : Convex, perceptionDistance : float, isDeaf : boolean, agentId : UUID,
-		motionBehavior : MotionBehavior) {
-		super(shape, perceptionDistance, isDeaf, agentId, motionBehavior)
+	new (shape : Convex,
+		frustrum : Convex,
+		isDeaf : boolean,
+		agentId : UUID,
+		motionBehavior : MotionBehavior
+	) {
+		super(shape, frustrum, isDeaf, agentId, motionBehavior)
 	}
 
-	new (shape : Convex, position : Vector2, perceptionDistance : float, isDeaf : boolean, agentId : UUID, motionBehavior : MotionBehavior) {
-		super(shape, position, perceptionDistance, isDeaf, agentId, motionBehavior)
+	new (shape : Convex,
+		frustrum : Convex,
+		position : Vector2,
+		isDeaf : boolean,
+		agentId : UUID,
+		motionBehavior : MotionBehavior
+	) {
+		super(shape, frustrum, position, isDeaf, agentId, motionBehavior)
 	}
 	
 	override getMaxLinearVelocity : float { MAX_LINEAR_VELOCITY }

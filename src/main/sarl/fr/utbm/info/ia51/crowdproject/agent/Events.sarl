@@ -28,7 +28,6 @@ import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import java.util.List
 import java.util.UUID
-import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 
 /**
@@ -104,9 +103,9 @@ event FrontEndEnvironmentInitialization {
  */
 event FrontEndEnvironmentChange {
 	
-	var objects : List<MobileBody>
+	var objects : List<EnvironmentBody>
 
-	new(objects : List<MobileBody>) {
+	new(objects : List<EnvironmentBody>) {
 		this.objects = objects
 	}
 }
