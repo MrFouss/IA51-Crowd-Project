@@ -59,7 +59,6 @@ agent Environment {
 	var motionBehavior : MotionBehavior
 	var time = 0 as long
 	val random = new Random
-	var lastNanoTime : long
 
 	on Initialize {
 
@@ -69,7 +68,6 @@ agent Environment {
 		var perceptionDistance = occurrence.parameters.get(3) as Float
 		motionBehavior = occurrence.parameters.get(4) as MotionBehavior
 		var controller = occurrence.parameters.get(5) as FXMLViewerController
-		lastNanoTime = System.nanoTime()
 
 		// Communication from environment to UI
 		(defaultSpace as OpenEventSpace).register(controller)
@@ -139,10 +137,7 @@ agent Environment {
 			// Change the state of the universe
 			applyActions(occurrence.actionsToApply, this.agentBodies)
 
-			val thisNanoTime = System.nanoTime
-			val timeDiff = thisNanoTime - this.lastNanoTime
-			this.lastNanoTime = thisNanoTime
-			world.update(timeDiff / 1.0e9)
+			updateEnvironment
 
 			if (isTargetReached(agentBodies.values, targetPosition)) {
 				// TODO do something to notify that all hamsters reached the target
