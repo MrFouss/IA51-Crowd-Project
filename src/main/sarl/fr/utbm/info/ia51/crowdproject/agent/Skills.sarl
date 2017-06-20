@@ -46,16 +46,18 @@ import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
  * Default implementation of the EnvironmentManager capacity
  */
 skill DefaultEnvironmentManager implements EnvironmentManager {
-
-	val UPDATE_TIME = 0.1f
+	
+	val DISTANCE_TO_TARGET = 10.0f;
 
 	var world : World
+	var lastNanoTime : long
 
 	new (width : float, height : float) {
 		this.world = new World()
 		this.world.gravity = World.ZERO_GRAVITY
 		this.world.settings.stepFrequency = 1.0f/60.0f
 		this.world.setBounds(new AxisAlignedBounds(width, height))
+		lastNanoTime = System.nanoTime()
 	}
 	
 	/** 
@@ -89,8 +91,6 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			
-//			getSkill(typeof(Logging)).info("[" + agentBody.position.x + " ; " + agentBody.position.y + "] ; " + agentBody.orientation)
-			
 			if(agentBody.motionBehavior == MotionBehavior::KINEMATIC) {
 				agentBody.setLinearVelocity(action.linear)
 				agentBody.setAngularVelocity(action.angular)
@@ -111,11 +111,11 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
 	def isTargetReached(agentBodies : Collection<AgentBody>, targetPosition : Vector2) : boolean {
-		return false
-//		for (body : agentBodies) {
-//			// TODO if any agent's body isn't within a certain range of the target, return false
-//		}
-//		return true
+		for (body : agentBodies) {
+			if (body.position.to(targetPosition).magnitude > DISTANCE_TO_TARGET)
+				return false
+		}
+		return true
 	}
 	
 	/** 
@@ -176,7 +176,10 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * Updates the physical state of the environment
 	 */
 	def updateEnvironment {
-		world.update(UPDATE_TIME)
+		val thisNanoTime = System.nanoTime
+		val timeDiff = thisNanoTime - this.lastNanoTime
+		this.lastNanoTime = thisNanoTime
+		world.update(timeDiff / 1.0e9)
 	}
 
 	/**
