@@ -92,14 +92,6 @@ capacity EnvironmentManager {
 	 */
 	def getAuditoryPerceptions(agentBody : AgentBody) : List<EnvironmentBody>
 	
-	/** 
-	 * Moves an object in a direction
-	 * 
-	 * @param object the object to move
-	 * @param motion data about the path the path to follow
-	 */
-	def moveObject(object : MobileBody, motion : MotionQuery)
-	
 	/**
 	 * Updates the physical state of the environment
 	 */

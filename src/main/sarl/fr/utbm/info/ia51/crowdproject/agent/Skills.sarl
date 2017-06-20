@@ -161,16 +161,6 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		
 		return perceivedObjects
 	}
-	
-	/** 
-	 * Moves an object in a direction
-	 * 
-	 * @param object the object to move
-	 * @param motion data about the path the path to follow
-	 */
-	def moveObject(object : MobileBody, motion : MotionQuery) {
-		// TODO
-	}
 
 	/** 
 	 * Updates the physical state of the environment
@@ -216,6 +206,7 @@ skill DefaultEnvironmentFrontEnd implements EnvironmentFrontEnd {
 skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	
 	uses DefaultContextInteractions
+	
 	/** 
 	 * Sends the environment a message, asking to be moved
 	 * 
