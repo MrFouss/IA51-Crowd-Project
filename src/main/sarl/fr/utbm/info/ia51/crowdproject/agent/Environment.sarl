@@ -43,6 +43,7 @@ import java.util.TreeMap
 import java.util.UUID
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.environment.SoundSource
 
 /**
  * The environment agent, managing all the other agents
@@ -53,6 +54,8 @@ agent Environment {
 
 	val agentBodies = new TreeMap<UUID, AgentBody>
 	val staticBodies = new LinkedList<StaticBody>
+	val soundSources = new LinkedList<SoundSource>
+	
 	val actions = new LinkedList<MotionQuery>
 	var targetPosition : Vector2
 
