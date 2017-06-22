@@ -88,7 +88,7 @@ agent Environment {
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
-			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 1.0f, frustrumAngle, isDeaf)
+			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 5.0f, frustrumAngle, isDeaf)
 			agentBodies.put(agentBody.agentId, agentBody)
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
