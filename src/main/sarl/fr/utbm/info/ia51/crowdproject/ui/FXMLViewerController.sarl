@@ -28,7 +28,6 @@ import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
-import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.janusproject.Boot
 import io.sarl.lang.core.Address
@@ -56,6 +55,11 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.geometry.Circle
+import org.dyn4j.geometry.Slice
+import javafx.scene.shape.Arc
+import javafx.scene.shape.ArcType
+import javafx.scene.paint.Color
+import javafx.scene.transform.Rotate
 
 /** 
  * 
@@ -66,7 +70,8 @@ class FXMLViewerController implements Initializable, EventListener {
 	public static val HEIGHT = 600.0f
 
 	public static val NB_HAMSTERS = 10
-	public static val PERCEPTION_DISTANCE = 15.0f
+	public static val FRUSTRUM_RADIUS = 50.0f
+	public static val FRUSTRUM_ANGLE = Math.PI.floatValue / 4.0f
 
 	public static var motionBehavior = MotionBehavior::KINEMATIC
 	
@@ -101,24 +106,25 @@ class FXMLViewerController implements Initializable, EventListener {
 	override receiveEvent(^event : Event) {
 		synchronized(this) {
 			if (^event instanceof FrontEndEnvironmentChange) {
-				^event.objects.forEach [ object |
-					if (shapes.get(object.userData as Integer) === null) {
-						object.userData = this.index
-						val shape = createShape(object)
-						shapes.add(shape)
-						this.index++
-					} else {
-						val shape = shapes.get(object.userData as Integer)
-						shape.transform(object)
-					}
+				^event.objects.forEach[object | 
+					object.fixtures.forEach[fixture |
+						if ((fixture.userData as Integer) === null) {
+							fixture.userData = this.index
+							shapes.add(createShape(object, fixture))
+							this.index++
+						} else {
+							val shape = shapes.get(fixture.userData as Integer)
+							shape.transform(object, fixture)
+						}
+					]
 				]
 			} else if (^event instanceof FrontEndEnvironmentInitialization) {
-				shapes = new ArrayList
-				^event.objects.forEach [ object |
-					object.userData = this.index
-					val shape = createShape(object)
-					shapes.add(shape)
-					this.index++
+				^event.objects.forEach[object | 
+					object.fixtures.forEach[fixture |
+						fixture.userData = this.index
+						shapes.add(createShape(object, fixture))
+						this.index++
+					]
 				]
 			}
 			worldDisplay.children.all = shapes
@@ -128,31 +134,52 @@ class FXMLViewerController implements Initializable, EventListener {
 	/**
 	 * Used to create the JavaFx shapes from dyn4j shapes
 	 * 
-	 * @param object an environmentBody that needs to have a dyn4j shape
+	 * @param object an object that needs to have a dyn4j shape
+	 * @param fixture a fixture of the object
 	 * @return the newly created JavaFX shape
 	 */
-	private def createShape(object : EnvironmentBody) : Shape {
-		for (geometry as BodyFixture : object.fixtures) {
-			if(geometry.shape instanceof Circle) {
-				var g = geometry.shape as Circle
-				return new javafx.scene.shape.Circle(
-					object.worldCenter.x + WIDTH /2,
-					object.worldCenter.y + HEIGHT / 2,
-					g.radius)
+	private def createShape(object : EnvironmentBody, fixture : BodyFixture) : Shape {
+		if (fixture.shape instanceof Circle) {
+			val g = fixture.shape as Circle
+			val circle = new javafx.scene.shape.Circle(
+				object.worldCenter.x + WIDTH /2,
+				object.worldCenter.y + HEIGHT / 2,
+				g.radius)
+				
+			return circle
 
-			} else if(geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
-				var g = geometry.shape as org.dyn4j.geometry.Rectangle
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Rectangle) {
+			val g = fixture.shape as org.dyn4j.geometry.Rectangle
 
-				// the object needs to be translated in order to center the figure
-				return new Rectangle(
-					object.worldCenter.x - g.width / 2 + WIDTH / 2,
-					object.worldCenter.y - g.height / 2 + HEIGHT / 2,
-					g.width,
-					g.height)
+			// the object needs to be translated in order to center the figure
+			val rectangle = new Rectangle(
+				object.worldCenter.x - g.width / 2 + WIDTH / 2,
+				object.worldCenter.y - g.height / 2 + HEIGHT / 2,
+				g.width,
+				g.height)
 
-			} else {
-				throw new GeometryConversionException("The shape \"" + geometry.class.toString + "\" can't handled.")
-			}
+			return rectangle
+
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
+			val g = fixture.shape as Slice
+			val angle = Math.toDegrees(g.theta)
+			
+			var arc = new Arc()
+			arc.centerX = object.worldCenter.x + WIDTH / 2
+			arc.centerY = object.worldCenter.y + HEIGHT / 2
+			arc.radiusX = g.sliceRadius
+			arc.radiusY = g.sliceRadius
+			arc.startAngle = object.transform.rotation - (angle / 2.0f)
+			arc.length = angle
+			arc.type = ArcType.ROUND
+			
+			arc.fill = null
+			arc.stroke = Color.BLUE
+			
+			return arc
+			
+		} else {
+			throw new GeometryConversionException("The shape \"" + fixture.class.toString + "\" can't handled.")
 		}
 	}
 
@@ -160,22 +187,27 @@ class FXMLViewerController implements Initializable, EventListener {
 	 * Used to transform the JavaFx shapes from dyn4j shapes
 	 * 
 	 * @param object an environmentBody that needs to have a dyn4j shape
+	 * @param fixture a fixture of the object
 	 * @return the newly created JavaFX shape
 	 */
-	private def transform(shape : Shape, object : MobileBody) {
-		for (geometry as BodyFixture : object.fixtures) {
-			if (geometry.shape instanceof Circle) {
-				var s = shape as javafx.scene.shape.Circle
-				s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2
-				s.translateY = object.worldCenter.y - s.centerY + HEIGHT / 2
-				s.rotate = object.orientation
-			} else if (geometry.shape instanceof org.dyn4j.geometry.Rectangle) {
-				var g = geometry.shape as org.dyn4j.geometry.Rectangle
-				var s = shape as Rectangle
-				s.x = object.worldCenter.x - g.width / 2 + WIDTH / 2
-				s.y = object.worldCenter.y + HEIGHT / 2
-				s.rotate = object.orientation
-			}
+	private def transform(shape : Shape, object : EnvironmentBody, fixture : BodyFixture) {
+		if (fixture.shape instanceof Circle) {
+			var s = shape as javafx.scene.shape.Circle
+			s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2
+			s.translateY = object.worldCenter.y - s.centerY + HEIGHT / 2
+			s.rotate = Math.toDegrees(object.orientation)
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Rectangle) {
+			var g = fixture.shape as org.dyn4j.geometry.Rectangle
+			var s = shape as Rectangle
+			s.x = object.worldCenter.x - g.width / 2 + WIDTH / 2
+			s.y = object.worldCenter.y + HEIGHT / 2
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
+			var g = fixture.shape as org.dyn4j.geometry.Slice
+			var s = shape as Arc
+			s.centerX = object.worldCenter.x + WIDTH / 2
+			s.centerY = object.worldCenter.y + HEIGHT / 2
+			s.transforms.clear
+			s.transforms.add(new Rotate(Math.toDegrees(object.orientation), s.centerX, s.centerY))
 		}
 	}
 	
@@ -208,8 +240,8 @@ class FXMLViewerController implements Initializable, EventListener {
 		// Convert the result to an arraylist when the launch button is clicked.
 		
 		dialog.setResultConverter([dialogButton | 
-		    if (dialogButton == launchButtonType) {
-		        return new ArrayList<String>(Arrays.asList(motionBox.getValue, nbHamsterField.getText));
+			if (dialogButton == launchButtonType) {
+				return new ArrayList<String>(Arrays.asList(motionBox.getValue, nbHamsterField.getText));
 		}
 		    return null;
 		]);
@@ -222,7 +254,7 @@ class FXMLViewerController implements Initializable, EventListener {
 				motionBehavior = MotionBehavior::STEERING
 			nbHamster = if(config.get(1) != "") Integer.valueOf(config.get(1)) else NB_HAMSTERS
 			
-			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, PERCEPTION_DISTANCE, motionBehavior,
+			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, motionBehavior,
 				this)
 			//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
 		]);

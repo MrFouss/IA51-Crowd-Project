@@ -26,7 +26,6 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.lang.core.Address
@@ -64,13 +63,18 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * Creates a hamster's body in the world
 	 * 
 	 * @param motionBehavior the world's motion behavior
-	 * @param perceptionDistance the distance of perception of the hamster
+	 * @param frustrumRadius the distance of perception of the hamster
+	 * @param frustrumAngle the radius of the frustrum of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(motionBehavior : MotionBehavior, perceptionDistance : float, isDeaf : boolean) : HamsterBody {
+	def createHamster(motionBehavior : MotionBehavior,
+		frustrumRadius : float,
+		frustrumAngle : float,
+		isDeaf : boolean
+	) : HamsterBody {
 		val body = new HamsterBody(
 			Geometry.createCircle(5.0f),
-			perceptionDistance,
+			Geometry.createSlice(frustrumRadius, frustrumAngle),
 			isDeaf,
 			UUID::randomUUID,
 			motionBehavior
@@ -111,11 +115,12 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @return <code>true</code> if all agents reached the target, <code>false</code> otherwise 
 	 */
 	def isTargetReached(agentBodies : Collection<AgentBody>, targetPosition : Vector2) : boolean {
-		for (body : agentBodies) {
-			if (body.position.to(targetPosition).magnitude > DISTANCE_TO_TARGET)
-				return false
-		}
-		return true
+//		for (body : agentBodies) {
+//			if (body.position.to(targetPosition).magnitude > DISTANCE_TO_TARGET)
+//				return false
+//		}
+//		return true
+		return false
 	}
 	
 	/** 

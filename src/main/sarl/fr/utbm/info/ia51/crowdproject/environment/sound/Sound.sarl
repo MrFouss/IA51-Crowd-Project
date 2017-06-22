@@ -21,50 +21,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.environment
+package fr.utbm.info.ia51.crowdproject.environment.sound
 
-import java.util.UUID
-import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
-import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import org.dyn4j.geometry.Geometry
-import org.dyn4j.geometry.Slice
 
 /** 
- * Class defining the body of a hamster
+ * Abstract definition of an object emitting a sound
  */
-class HamsterBody extends AgentBody {
+abstract class Sound {
 	
-	val MAX_LINEAR_VELOCITY = 100.0f
-	val MAX_LINEAR_ACCELERATION = 100.0f
-	val MAX_ANGULAR_VELOCITY = 30.0f
-	val MAX_ANGULAR_ACCELERATION = 30.0f
+	val SOUND_SPEED = 3.0f
 
-	new (shape : Convex,
-		frustrum : Convex,
-		isDeaf : boolean,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, isDeaf, agentId, motionBehavior)
-	}
+	val position : Vector2
+	val range : float 
+	val lifespan : double
+	var timeElapsed = 0.0
 
-	new (shape : Convex,
-		frustrum : Convex,
-		position : Vector2,
-		isDeaf : boolean,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, position, isDeaf, agentId, motionBehavior)
+	new (position : Vector2, range : float) {
+		this.position = position
+		this.lifespan = Double.POSITIVE_INFINITY
+		this.range = range
 	}
 	
-	override getMaxLinearVelocity : float { MAX_LINEAR_VELOCITY }
+	new (position : Vector2, range : float, lifespan : double) {
+		this.position = position
+		this.lifespan = lifespan
+		this.range = range
+	}
 	
-	override getMaxLinearAcceleration : float { MAX_LINEAR_ACCELERATION }
+	def getMinRange : float {
+		if (timeElapsed > lifespan)
+			return SOUND_SPEED * (timeElapsed - lifespan) as float 
+		else
+			return 0.0f
+	}
 	
-	override getMaxAngularVelocity : float { MAX_ANGULAR_VELOCITY }
+	def getMaxRange : float {
+		if (timeElapsed < (range / SOUND_SPEED))
+			return SOUND_SPEED * (timeElapsed as float)
+		else
+			return maxRange
+	}
 	
-	override getMaxAngularAcceleration : float { MAX_ANGULAR_ACCELERATION }
-	
+	/**
+	 * Checks if the sound should be removed or not
+	 * 
+	 * @return <code>true</code> if the sound object has to be removed, <code>false</code> otherwise
+	 */
+	def isActive : boolean {
+		return (timeElapsed - lifespan) < (range / SOUND_SPEED)
+	}
 }

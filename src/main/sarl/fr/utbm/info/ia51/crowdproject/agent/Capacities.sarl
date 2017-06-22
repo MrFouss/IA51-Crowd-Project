@@ -46,10 +46,11 @@ capacity EnvironmentManager {
 	 * Creates a hamster's body in the world
 	 * 
 	 * @param motionBehavior the world's motionBehavior
-	 * @param perceptionDistance the distance of perception of the hamster
+	 * @param frustrumRadius the distance of perception of the hamster
+	 * @param frustrumAngle the radius of the frustrum of the hamster
 	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
-	def createHamster(motionBehavior : MotionBehavior, perceptionDistance : float, isDeaf : boolean) : HamsterBody
+	def createHamster(motionBehavior : MotionBehavior, frustrumRadius : float, frustrumAngle : float, isDeaf : boolean) : HamsterBody
 	
 	/** 
 	 * Apply the list of actions
