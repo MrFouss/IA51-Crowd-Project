@@ -56,6 +56,7 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.geometry.Circle
+import org.dyn4j.dynamics.Body
 
 /** 
  * 
@@ -109,7 +110,10 @@ class FXMLViewerController implements Initializable, EventListener {
 						this.index++
 					} else {
 						val shape = shapes.get(object.userData as Integer)
-						shape.transform(object)
+						
+						// don't apply transforms if the object is a sound source
+						if (object instanceof MobileBody)
+							shape.transform(object)
 					}
 				]
 			} else if (^event instanceof FrontEndEnvironmentInitialization) {
@@ -131,7 +135,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	 * @param object an environmentBody that needs to have a dyn4j shape
 	 * @return the newly created JavaFX shape
 	 */
-	private def createShape(object : EnvironmentBody) : Shape {
+	private def createShape(object : Body) : Shape {
 		for (geometry as BodyFixture : object.fixtures) {
 			if(geometry.shape instanceof Circle) {
 				var g = geometry.shape as Circle

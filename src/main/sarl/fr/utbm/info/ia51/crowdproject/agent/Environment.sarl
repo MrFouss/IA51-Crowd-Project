@@ -44,6 +44,7 @@ import java.util.UUID
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.environment.SoundSource
+import org.dyn4j.dynamics.Body
 
 /**
  * The environment agent, managing all the other agents
@@ -98,9 +99,10 @@ agent Environment {
 		
 		info("Number of bodies in the world: " + world.bodyCount)
 		
-		val totalListOfBodies = new ArrayList<EnvironmentBody>
+		val totalListOfBodies = new ArrayList<Body>
 		totalListOfBodies += agentBodies.values
 		totalListOfBodies += staticBodies
+		totalListOfBodies += soundSources
 		emit(new FrontEndEnvironmentInitialization(totalListOfBodies))
 		
 		emit(new RunBeginningOfStep) [it.isMe]
@@ -148,6 +150,9 @@ agent Environment {
 			}
 			
 			// Informs the view that a front end update is needed
+			val bodiesToVisuallyUpdate = new ArrayList<Body>()
+			bodiesToVisuallyUpdate += (agentBodies.values)
+			bodiesToVisuallyUpdate += soundSources
 			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
 			Thread.sleep(100/6)
 			

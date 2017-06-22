@@ -30,6 +30,7 @@ import java.util.List
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import org.dyn4j.dynamics.Body
 
 /**
  * A perception for an agent
@@ -92,9 +93,9 @@ event EndOfSimulation
  */
 event FrontEndEnvironmentInitialization {
 
-	var objects : List<EnvironmentBody>
+	var objects : List<Body>
 
-	new(objects : List<EnvironmentBody>) {
+	new(objects : List<Body>) {
 		this.objects = objects
 	}
 }
@@ -104,9 +105,9 @@ event FrontEndEnvironmentInitialization {
  */
 event FrontEndEnvironmentChange {
 	
-	var objects : List<MobileBody>
+	var objects : List<Body>
 
-	new(objects : List<MobileBody>) {
+	new(objects : List<Body>) {
 		this.objects = objects
 	}
 }
