@@ -60,6 +60,8 @@ import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
 import javafx.scene.paint.Color
 import javafx.scene.transform.Rotate
+import org.dyn4j.dynamics.Body
+import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 
 /** 
  * 
@@ -114,7 +116,10 @@ class FXMLViewerController implements Initializable, EventListener {
 							this.index++
 						} else {
 							val shape = shapes.get(fixture.userData as Integer)
-							shape.transform(object, fixture)
+							
+							// don't apply transforms if the object is a sound source
+							if (object instanceof MobileBody)
+								shape.transform(object, fixture)
 						}
 					]
 				]
@@ -138,7 +143,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	 * @param fixture a fixture of the object
 	 * @return the newly created JavaFX shape
 	 */
-	private def createShape(object : EnvironmentBody, fixture : BodyFixture) : Shape {
+	private def createShape(object : Body, fixture : BodyFixture) : Shape {
 		if (fixture.shape instanceof Circle) {
 			val g = fixture.shape as Circle
 			val circle = new javafx.scene.shape.Circle(
@@ -190,7 +195,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	 * @param fixture a fixture of the object
 	 * @return the newly created JavaFX shape
 	 */
-	private def transform(shape : Shape, object : EnvironmentBody, fixture : BodyFixture) {
+	private def transform(shape : Shape, object : MobileBody, fixture : BodyFixture) {
 		if (fixture.shape instanceof Circle) {
 			var s = shape as javafx.scene.shape.Circle
 			s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2

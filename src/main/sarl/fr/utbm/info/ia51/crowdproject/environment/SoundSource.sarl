@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.environment.sound
+package fr.utbm.info.ia51.crowdproject.environment
 
 import org.dyn4j.geometry.Vector2
+import org.dyn4j.dynamics.Body
+import org.dyn4j.geometry.Geometry
 
 /** 
  * Abstract definition of an object emitting a sound
  */
-abstract class Sound {
+abstract class SoundSource extends Body {
 	
 	val SOUND_SPEED = 3.0f
 
@@ -41,6 +43,8 @@ abstract class Sound {
 		this.position = position
 		this.lifespan = Double.POSITIVE_INFINITY
 		this.range = range
+		val newFixture = this.addFixture(Geometry.createCircle(range))
+		newFixture.sensor = true
 	}
 	
 	new (position : Vector2, range : float, lifespan : double) {
