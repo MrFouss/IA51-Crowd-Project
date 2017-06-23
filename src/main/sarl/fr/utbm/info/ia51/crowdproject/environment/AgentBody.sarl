@@ -27,11 +27,12 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import javax.sound.sampled.BooleanControl.Type
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	val agentId : UUID
-	val isDeaf : boolean
+	val deaf : boolean
 	val motionBehavior : MotionBehavior
 
 	new (shape : Convex,
@@ -43,7 +44,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		super(shape)
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
-		this.isDeaf = isDeaf
+		this.deaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
 	}
@@ -59,7 +60,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
 		this.translate(position)
-		this.isDeaf = isDeaf
+		this.deaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
 	}
@@ -107,6 +108,13 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 			default:
 				throw new EnumConstantNotPresentException(MotionBehavior, "Motion behavior not yet supported")
 		}
+	}
+	
+	/**
+	 * Getter for the deaf attribute
+	 */
+	def isDeaf : boolean {
+		deaf
 	}
 	
 	abstract def getMaxLinearVelocity : float
