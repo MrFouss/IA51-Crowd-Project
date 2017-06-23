@@ -92,7 +92,7 @@ agent Environment {
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
-			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 5.0f, frustrumAngle, isDeaf)
+			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 5.0f, frustrumAngle)
 			agentBodies.put(agentBody.agentId, agentBody)
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
@@ -152,7 +152,10 @@ agent Environment {
 			}
 			
 			// Informs the view that a front end update is needed
-			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
+			val bodiesToVisuallyUpdate = new ArrayList<Body>()
+			bodiesToVisuallyUpdate += (agentBodies.values)
+			bodiesToVisuallyUpdate += soundSources
+			emit(new FrontEndEnvironmentChange(bodiesToVisuallyUpdate))
 			Thread.sleep(100/6)
 			
 			// Increase time value

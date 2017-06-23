@@ -65,17 +65,14 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param motionBehavior the world's motion behavior
 	 * @param frustrumRadius the distance of perception of the hamster
 	 * @param frustrumAngle the radius of the frustrum of the hamster
-	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
 	def createHamster(motionBehavior : MotionBehavior,
 		frustrumRadius : float,
-		frustrumAngle : float,
-		isDeaf : boolean
+		frustrumAngle : float
 	) : HamsterBody {
 		val body = new HamsterBody(
 			Geometry.createCircle(5.0f),
 			Geometry.createSlice(frustrumRadius, frustrumAngle),
-			isDeaf,
 			UUID::randomUUID,
 			motionBehavior
 		)
@@ -107,7 +104,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
 			}
 			
-			if(action.hasScream) {
+			if(action.isCrying) {
 				if (agentBody.fixtureCount < 3) {
 					var screamFixture = agentBody.addFixture(Geometry.createCircle(100.0f))
 					screamFixture.setSensor(true)

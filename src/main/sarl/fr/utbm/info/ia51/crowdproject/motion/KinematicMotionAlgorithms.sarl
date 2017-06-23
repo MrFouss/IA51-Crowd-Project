@@ -39,7 +39,7 @@ class KinematicWanderAlgorithm implements WanderAlgorithm {
 		
 		var velocity = Vector2.create(maxLinear * 0.75f, orientation)
 		var angle = ((Math.random - Math.random) * maxAngular) as float
-		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, velocity, angle, false)
+		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, velocity, angle)
 	}
 }
 
@@ -70,7 +70,7 @@ class KinematicSeekAlgorithm implements SeekAlgorithm {
 		else
 			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
 
-		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity, false)
+		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
 }
 /** 
@@ -99,6 +99,6 @@ class KinematicFleeAlgorithm implements FleeAlgorithm {
 		else
 			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
 
-		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity, false)
+		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
 }

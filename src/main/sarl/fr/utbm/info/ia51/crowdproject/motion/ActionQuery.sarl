@@ -34,20 +34,20 @@ class ActionQuery {
 	val motionBehavior : MotionBehavior
 	var linear = new Vector2(0.0f, 0.0f)
 	var angular = 0f
-	var scream : boolean
+	var cry : CryType
 	
-	new (emitter : UUID, motionBehavior : MotionBehavior, scream : boolean) {
+	new (emitter : UUID, motionBehavior : MotionBehavior) {
 		this.emitter = emitter
 		this.motionBehavior = motionBehavior
-		this.scream = scream
+		this.cry = CryType.NONE
 	}
 
-	new (emitter : UUID, motionBehavior : MotionBehavior, linear : Vector2, angular : float, scream : boolean) {
+	new (emitter : UUID, motionBehavior : MotionBehavior, linear : Vector2, angular : float) {
 		this.emitter = emitter
 		this.motionBehavior = motionBehavior
 		this.linear = linear
 		this.angular = angular
-		this.scream = scream
+		this.cry = CryType.NONE
 	}
 	
 	new (toCopy : ActionQuery) {
@@ -55,7 +55,7 @@ class ActionQuery {
 		this.motionBehavior = toCopy.motionBehavior
 		this.linear = toCopy.linear
 		this.angular = toCopy.angular
-		this.scream = toCopy.scream
+		this.cry = toCopy.cry
 	}
 	
 	def getEmitter : UUID {
@@ -87,11 +87,15 @@ class ActionQuery {
 		this.angular = angular
 	}
 	
-	def hasScream() {
-		return this.scream
+	def isCrying() {
+		return this.cry == CryType.NONE
 	}
 	
-	def setScream(scream : boolean) {
-		this.scream = scream
+	def getCryType : CryType {
+		return this.cry
+	}
+	
+	def setCry(cry : CryType) {
+		this.cry = cry
 	}
 }

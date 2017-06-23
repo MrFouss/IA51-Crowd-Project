@@ -21,46 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.environment
-
-import java.util.UUID
-import org.dyn4j.geometry.Convex
-import org.dyn4j.geometry.Vector2
-import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+package fr.utbm.info.ia51.crowdproject.motion
 
 /** 
- * Class defining the body of a hamster
+ * The type of cry emitted by an agent
  */
-class HamsterBody extends AgentBody {
-	
-	val MAX_LINEAR_VELOCITY = 100.0f
-	val MAX_LINEAR_ACCELERATION = 100.0f
-	val MAX_ANGULAR_VELOCITY = 30.0f
-	val MAX_ANGULAR_ACCELERATION = 30.0f
-	
-	new (shape : Convex,
-		frustrum : Convex,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, agentId, motionBehavior)
-	}
-
-	new (shape : Convex,
-		frustrum : Convex,
-		position : Vector2,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, position, agentId, motionBehavior)
-	}
-	
-	override getMaxLinearVelocity : float { MAX_LINEAR_VELOCITY }
-	
-	override getMaxLinearAcceleration : float { MAX_LINEAR_ACCELERATION }
-	
-	override getMaxAngularVelocity : float { MAX_ANGULAR_VELOCITY }
-	
-	override getMaxAngularAcceleration : float { MAX_ANGULAR_ACCELERATION }
-	
+enum CryType {
+	NONE,
+	POSITIVE,
+	WARNING
 }

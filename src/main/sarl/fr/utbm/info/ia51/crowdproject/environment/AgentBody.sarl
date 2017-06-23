@@ -27,33 +27,30 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	
 	val agentId : UUID
-	val isDeaf : boolean
 	val motionBehavior : MotionBehavior
-	val screams : boolean
+	val cry : CryType
 	
 	new (shape : Convex,
 		frustrum : Convex,
-		isDeaf : boolean,
 		agentId : UUID,
 		motionBehavior : MotionBehavior
 	) {
 		super(shape)
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
-		this.isDeaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
-		this.screams = false
+		this.cry = CryType.NONE
 	}
 
 	new (shape : Convex,
 		frustrum : Convex,
 		position : Vector2,
-		isDeaf : boolean,
 		agentId : UUID,
 		motionBehavior : MotionBehavior
 	) {
@@ -61,10 +58,9 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
 		this.translate(position)
-		this.isDeaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
-		this.screams = false
+		this.cry = CryType.NONE
 	}
 	
 	def getAgentId : UUID {
@@ -82,6 +78,10 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	
 	def getMotionBehavior : MotionBehavior {
 		return this.motionBehavior
+	}
+	
+	def getCry : CryType {
+		return this.cry
 	}
 	
 	/**

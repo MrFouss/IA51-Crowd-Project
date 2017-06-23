@@ -52,7 +52,7 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 		var linearVector = center.add(displacement)
 		linearVector.magnitude = maxLinear / 2.0f
 
-		return new ActionQuery(emitter, MotionBehavior::STEERING, linearVector, angle, false)
+		return new ActionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
 	}
 }
 

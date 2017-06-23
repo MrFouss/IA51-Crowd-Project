@@ -37,6 +37,7 @@ import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 /**
  * The hamster agent
@@ -90,7 +91,7 @@ agent Hamster extends Animat {
 					occurrence.agentBody.maxAngular
 				)
 			}
-			computedMotion.scream = true;
+			computedMotion.cry = CryType.POSITIVE
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
 		}

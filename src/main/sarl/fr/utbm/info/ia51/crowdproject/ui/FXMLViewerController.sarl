@@ -119,7 +119,7 @@ class FXMLViewerController implements Initializable, EventListener {
 						} else {
 							val shape = shapes.get(fixture.userData as Integer)
 							
-							// don't apply transforms if the object is a sound source
+							// don't apply transforms if the object is not movable
 							if (object instanceof MobileBody)
 								shape.transform(object, fixture)
 						}
