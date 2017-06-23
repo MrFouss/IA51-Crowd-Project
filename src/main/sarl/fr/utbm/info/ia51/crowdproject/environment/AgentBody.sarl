@@ -29,11 +29,12 @@ import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
-
+	
 	val agentId : UUID
 	val isDeaf : boolean
 	val motionBehavior : MotionBehavior
-
+	val screams : boolean
+	
 	new (shape : Convex,
 		frustrum : Convex,
 		isDeaf : boolean,
@@ -46,6 +47,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		this.isDeaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
+		this.screams = false
 	}
 
 	new (shape : Convex,
@@ -62,6 +64,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 		this.isDeaf = isDeaf
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
+		this.screams = false
 	}
 	
 	def getAgentId : UUID {

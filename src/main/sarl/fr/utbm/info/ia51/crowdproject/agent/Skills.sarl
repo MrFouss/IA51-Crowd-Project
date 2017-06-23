@@ -26,7 +26,7 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.lang.core.Address
 import java.util.Collection
@@ -79,6 +79,8 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 			UUID::randomUUID,
 			motionBehavior
 		)
+		body.getFixture(0).userData = -1
+		body.getFixture(1).userData = -1
 		body.translate(Math.random * 600 - 300, Math.random * 400 - 200)
 		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
@@ -91,7 +93,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param actions the list of actions to apply
 	 * @param agentBodies the list of agent bodies
 	 */
-	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
+	def applyActions(actions : List<ActionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			
@@ -103,6 +105,18 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				agentBody.applyTorque(action.angular)
 			} else {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
+			}
+			
+			if(action.hasScream) {
+				if (agentBody.fixtureCount < 3) {
+					var screamFixture = agentBody.addFixture(Geometry.createCircle(100.0f))
+					screamFixture.setSensor(true)
+					screamFixture.userData = -1;
+				}
+			} else {
+				if (agentBody.fixtureCount == 3) {
+					agentBody.removeFixture(2)
+				}
 			}
 		}
 	}
@@ -176,7 +190,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		this.lastNanoTime = thisNanoTime
 		world.update(timeDiff / 1.0e9)
 	}
-
+	
 	/**
 	 * Getter of the world
 	 * 
@@ -220,7 +234,7 @@ skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	 * @param time the time at which the movement query is sent
 	 * @param motion data about the path to follow
 	 */
-	def move(agentId : UUID, environmentAddress : Address, time : long, motion : MotionQuery) {
+	def move(agentId : UUID, environmentAddress : Address, time : long, motion : ActionQuery) {
 		emit(new Action(agentId, time, motion))
 			[it == environmentAddress]
 	}

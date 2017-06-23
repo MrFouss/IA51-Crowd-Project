@@ -112,7 +112,7 @@ class FXMLViewerController implements Initializable, EventListener {
 			if (^event instanceof FrontEndEnvironmentChange) {
 				^event.objects.forEach[object | 
 					object.fixtures.forEach[fixture |
-						if ((fixture.userData as Integer) === null) {
+						if ((fixture.userData as Integer) == -1) {
 							fixture.userData = this.index
 							shapes.add(createShape(object, fixture))
 							this.index++

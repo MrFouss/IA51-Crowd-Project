@@ -28,7 +28,7 @@ import fr.utbm.info.ia51.crowdproject.environment.LevelDesign
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.SoundSource
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.core.Destroy
@@ -43,19 +43,20 @@ import java.util.TreeMap
 import java.util.UUID
 import org.dyn4j.dynamics.Body
 import org.dyn4j.geometry.Vector2
+import org.dyn4j.geometry.Geometry
 
 /**
  * The environment agent, managing all the other agents
  */
 agent Environment {
-	
+
 	uses Logging, Lifecycle, DefaultContextInteractions, EnvironmentManager, EnvironmentFrontEnd
 
 	val agentBodies = new TreeMap<UUID, AgentBody>
 	val soundSources = new LinkedList<SoundSource>
 	var levelDesign : LevelDesign
 	
-	val actions = new LinkedList<MotionQuery>
+	val actions = new LinkedList<ActionQuery>
 	var targetPosition : Vector2
 
 	var motionBehavior : MotionBehavior
@@ -87,7 +88,7 @@ agent Environment {
 		for(s : this.levelDesign.staticBodies) {
 			world.addBody(s)
 		}
-		
+	
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
@@ -134,7 +135,7 @@ agent Environment {
 			}
 		}
 	}
-
+	
 	on RunEndOfStep {
 		synchronized (this) {
 			// Eventually take into account the actions of the player
@@ -151,9 +152,6 @@ agent Environment {
 			}
 			
 			// Informs the view that a front end update is needed
-			val bodiesToVisuallyUpdate = new ArrayList<Body>()
-			bodiesToVisuallyUpdate += (agentBodies.values)
-			bodiesToVisuallyUpdate += soundSources
 			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
 			Thread.sleep(100/6)
 			

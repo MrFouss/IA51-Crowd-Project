@@ -27,7 +27,7 @@ import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import io.sarl.lang.core.Address
 import java.util.Collection
 import java.util.List
@@ -58,7 +58,7 @@ capacity EnvironmentManager {
 	 * @param actions the list of actions to apply
 	 * @param agentBodies the list of agent bodies
 	 */
-	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>)
+	def applyActions(actions : List<ActionQuery>, agentBodies : Map<UUID, AgentBody>)
 	
 	/** 
 	 * Checks if the target has been reached for all agents
@@ -138,5 +138,6 @@ capacity EnvironmentMotion {
 	 * @param time the time at which the movement query is sent
 	 * @param computedMotion data about the path to follow
 	 */
-	def move(agentId : UUID, environmentAddress : Address, time : long, computedMotion : MotionQuery)
+	def move(agentId : UUID, environmentAddress : Address, time : long, computedMotion : ActionQuery)
 }
+

@@ -38,7 +38,7 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 		orientation : double,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery {
+	) : ActionQuery {
 		
 		// Calculate the circle center
 		var center = Vector2.create(WANDER_CIRCLE_DISTANCE, orientation)
@@ -52,7 +52,7 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 		var linearVector = center.add(displacement)
 		linearVector.magnitude = maxLinear / 2.0f
 
-		return new MotionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
+		return new ActionQuery(emitter, MotionBehavior::STEERING, linearVector, angle, false)
 	}
 }
 
@@ -67,7 +67,7 @@ class SteeringSeekAlgorithm implements SeekAlgorithm {
 		targetRelativePosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery {
+	) : ActionQuery {
 		
 		
 	}
@@ -84,6 +84,6 @@ class SteeringFleeAlgorithm implements FleeAlgorithm {
 		targetRelativePosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery {
+	) : ActionQuery {
 	}
 }

@@ -35,7 +35,7 @@ interface WanderAlgorithm {
 		orientation : double,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : ActionQuery
 }
 
 /** 
@@ -52,7 +52,7 @@ interface SeekAlgorithm {
 		targetPosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : ActionQuery
 }
 
 /** 
@@ -68,5 +68,5 @@ interface FleeAlgorithm {
 		targetPosition : Vector2,
 		maxLinear : float,
 		maxAngular : float
-	) : MotionQuery
+	) : ActionQuery
 }

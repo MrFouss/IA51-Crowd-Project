@@ -29,29 +29,33 @@ import java.util.UUID
 /** 
  * Definition of the output of a motion algorithm
  */
-class MotionQuery {
+class ActionQuery {
 	val emitter : UUID
 	val motionBehavior : MotionBehavior
 	var linear = new Vector2(0.0f, 0.0f)
 	var angular = 0f
+	var scream : boolean
 	
-	new (emitter : UUID, motionBehavior : MotionBehavior) {
+	new (emitter : UUID, motionBehavior : MotionBehavior, scream : boolean) {
 		this.emitter = emitter
 		this.motionBehavior = motionBehavior
+		this.scream = scream
 	}
 
-	new (emitter : UUID, motionBehavior : MotionBehavior, linear : Vector2, angular : float) {
+	new (emitter : UUID, motionBehavior : MotionBehavior, linear : Vector2, angular : float, scream : boolean) {
 		this.emitter = emitter
 		this.motionBehavior = motionBehavior
 		this.linear = linear
 		this.angular = angular
+		this.scream = scream
 	}
 	
-	new (toCopy : MotionQuery) {
+	new (toCopy : ActionQuery) {
 		this.emitter = toCopy.emitter
 		this.motionBehavior = toCopy.motionBehavior
 		this.linear = toCopy.linear
 		this.angular = toCopy.angular
+		this.scream = toCopy.scream
 	}
 	
 	def getEmitter : UUID {
@@ -81,5 +85,13 @@ class MotionQuery {
 
 	def setAngular(angular : float) {
 		this.angular = angular
+	}
+	
+	def hasScream() {
+		return this.scream
+	}
+	
+	def setScream(scream : boolean) {
+		this.scream = scream
 	}
 }

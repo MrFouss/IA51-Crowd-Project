@@ -25,7 +25,7 @@ package fr.utbm.info.ia51.crowdproject.^agent
 
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import java.util.List
 import java.util.UUID
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
@@ -56,9 +56,9 @@ event Action {
 
 	val agentId : UUID
 	val time : long
-	val motion : MotionQuery
+	val motion : ActionQuery
 
-	new (agentId : UUID, time : long, motion : MotionQuery) {
+	new (agentId : UUID, time : long, motion : ActionQuery) {
 		this.agentId = agentId
 		this.time = time
 		this.motion = motion
@@ -75,9 +75,9 @@ event RunBeginningOfStep
  */
 event RunEndOfStep {
 	
-	var actionsToApply : List<MotionQuery>
+	var actionsToApply : List<ActionQuery>
 	
-	new (actionsToApply : List<MotionQuery>) {
+	new (actionsToApply : List<ActionQuery>) {
 		this.actionsToApply = actionsToApply
 	}
 }
