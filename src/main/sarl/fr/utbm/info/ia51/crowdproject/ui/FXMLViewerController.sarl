@@ -198,13 +198,21 @@ class FXMLViewerController implements Initializable, EventListener {
 				shape.fill = Color.BROWN
 				shape.stroke = Color.CHOCOLATE
 			}
+			case WALL: {
+				shape.fill = Color.BLACK
+				shape.stroke = Color.GRAY
+			}
 			case FRUSTRUM: {
 				shape.fill = Color.TRANSPARENT
 				shape.stroke = if(visualDebug) Color.BLUE else Color.TRANSPARENT
 			}
-			case WALL: {
-				shape.fill = Color.BLACK
-				shape.stroke = Color.GRAY
+			case BEACON_BODY: {
+				shape.fill = Color.DARKCYAN
+				shape.stroke = Color.CYAN
+			}
+			case TARGET_SOUND: {
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.GOLD
 			}
 			case NO_CRY: {
 				shape.fill = Color.TRANSPARENT

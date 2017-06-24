@@ -23,16 +23,31 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
+import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.CryType
+import org.dyn4j.geometry.Geometry
+
 /** 
- * Enumeration used to know what kind of shape a fixture represents
+ * 
  */
-enum ShapeType {
-	HAMSTER_BODY,
-	WALL,
-	FRUSTRUM,
-	BEACON_BODY,
-	TARGET_SOUND,
-	NO_CRY,
-	POSITIVE_CRY,
-	WARNING_CRY
+class SoundBeaconBody extends StaticSoundSource {
+	
+	new (soundType : CryType, position : Vector2) {
+		
+		super(Geometry.createCircle(10), soundType, 100.0f, Double.POSITIVE_INFINITY)
+		
+		switch (soundType) {
+			case POSITIVE: {
+				this.getFixture(1).userData = ShapeType.POSITIVE_CRY
+			}
+			case WARNING: {
+				this.getFixture(1).userData = ShapeType.WARNING_CRY
+			}
+			case NONE: {
+				throw new EnumConstantNotPresentException(CryType, "NONE constant not supported")
+			}
+		}
+
+		this.translate(position)
+	}
 }

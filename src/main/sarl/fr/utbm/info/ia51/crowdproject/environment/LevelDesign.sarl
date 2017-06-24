@@ -27,22 +27,31 @@ package fr.utbm.info.ia51.crowdproject.environment
 import java.awt.Color
 import java.util.LinkedList
 import org.dyn4j.geometry.Geometry
+import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 class LevelDesign {
 	val level : Levels
 	val width : float
 	val height : float
+	
 	var staticBodies = new LinkedList<StaticBody>
+	var soundSources = new LinkedList<StaticSoundSource>
 	
 	new(level : Levels, width : float, height : float) {
 		this.level = level
 		this.width = width
 		this.height = height
 		createStaticBodies
+		createSoundSources
 	}
 
 	def getStaticBodies : LinkedList<StaticBody> {
 		return staticBodies
+	}
+
+	def getSoundSources : LinkedList<StaticSoundSource> {
+		return soundSources
 	}
 	
 	def createStaticBodies {
@@ -100,5 +109,34 @@ class LevelDesign {
 				bWall.getFixture(0).userData = ShapeType.WALL
 			}
 		}
-	}	
+	}
+
+	def createSoundSources {
+
+		switch (this.level) {
+			case BASIC: {
+				// Spawn target
+				val target = new TargetBody(new Vector2(0.0f, -200.0f))
+				this.soundSources += target
+				
+				val beacon1 = new SoundBeaconBody(CryType.POSITIVE, new Vector2(-200.0f, 0.0f))
+				this.soundSources += beacon1
+
+				val beacon2 = new SoundBeaconBody(CryType.WARNING, new Vector2(200.0f, 0.0f))
+				this.soundSources += beacon2
+			}
+			
+			case PARALLELISM: {
+				// Spawn target
+				val target = new TargetBody(new Vector2(0.0f, -200.0f))
+				this.soundSources += target
+
+				val beacon1 = new SoundBeaconBody(CryType.POSITIVE, new Vector2(-200.0f, 0.0f))
+				this.soundSources += beacon1
+
+				val beacon2 = new SoundBeaconBody(CryType.WARNING, new Vector2(200.0f, 0.0f))
+				this.soundSources += beacon2
+			}
+		}
+	}
 }
