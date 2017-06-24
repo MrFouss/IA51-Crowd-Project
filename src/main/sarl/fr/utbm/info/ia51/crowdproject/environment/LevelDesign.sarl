@@ -51,56 +51,53 @@ class LevelDesign {
 		topWall.getFixture(0).setRestitution(0.5)
 		topWall.translate(0, -height / 2 + 3)
 		this.staticBodies += topWall
-		topWall.getFixture(0).userData = -1
+		topWall.getFixture(0).userData = ShapeType.WALL
 		
 		// Spawn bottom wall
 		val bottomWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
 		bottomWall.getFixture(0).setRestitution(0.5)
 		bottomWall.translate(0, height / 2 - 3)
 		this.staticBodies += bottomWall
-		bottomWall.getFixture(0).userData = -1
+		bottomWall.getFixture(0).userData = ShapeType.WALL
 
 		// Spawn left wall
 		val leftWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		leftWall.getFixture(0).setRestitution(0.5)
 		leftWall.translate(-width / 2 + 3, 0)
 		this.staticBodies += leftWall
-		leftWall.getFixture(0).userData = -1
+		leftWall.getFixture(0).userData = ShapeType.WALL
 
 		// Spawn right wall
 		val rightWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		rightWall.getFixture(0).setRestitution(0.5)
 		rightWall.translate(width / 2 - 3, 0)
 		this.staticBodies += rightWall
-		rightWall.getFixture(0).userData = -1
+		rightWall.getFixture(0).userData = ShapeType.WALL
 		
 		switch (this.level) {
 			case BASIC: {
-					// Spawn middle wall
-					val midWall = new StaticBody(Geometry.createRectangle(6, height / 2), Color.GRAY)
-					midWall.getFixture(0).setRestitution(0.5)
-					midWall.translate(0, 0)
-					midWall.getFixture(0).userData = -1
-					this.staticBodies += midWall
-				}
+				// Spawn middle wall
+				val midWall = new StaticBody(Geometry.createRectangle(6, height / 2), Color.GRAY)
+				midWall.getFixture(0).setRestitution(0.5)
+				midWall.getFixture(0).userData = ShapeType.WALL
+				midWall.translate(0, 0)
+				this.staticBodies += midWall
+			}
 		
 			case PARALLELISM: {
 				// Spawn half top wall
 				val aWall = new StaticBody(Geometry.createRectangle(width / 2, 6), Color.GRAY)
 				aWall.getFixture(0).setRestitution(0.5)
+				aWall.getFixture(0).userData = ShapeType.WALL
 				aWall.translate(0, height / 4)
 				this.staticBodies += aWall
-				aWall.getFixture(0).userData = -1
 
 				// Spawn half bottom wall
 				val bWall = new StaticBody(Geometry.createRectangle(width / 2, 6), Color.GRAY)
 				bWall.getFixture(0).setRestitution(0.5)
 				bWall.translate(0, -height / 4)
 				this.staticBodies += bWall
-				bWall.getFixture(0).userData = -1
-			}
-			default: {
-				
+				bWall.getFixture(0).userData = ShapeType.WALL
 			}
 		}
 	}	

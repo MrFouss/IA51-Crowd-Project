@@ -37,12 +37,18 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	
 	new (shape : Convex,
 		frustrum : Convex,
+		cryRange : Convex,
 		agentId : UUID,
 		motionBehavior : MotionBehavior
 	) {
 		super(shape)
+		
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
+		
+		var cryFixture = this.addFixture(cryRange)
+		cryFixture.sensor = true
+		
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior
 		this.cry = CryType.NONE
@@ -50,13 +56,19 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 
 	new (shape : Convex,
 		frustrum : Convex,
+		cryRange : Convex,
 		position : Vector2,
 		agentId : UUID,
 		motionBehavior : MotionBehavior
 	) {
 		super(shape)
+		
 		var frustrumFixture = this.addFixture(frustrum)
 		frustrumFixture.sensor = true
+
+		var cryFixture = this.addFixture(cryRange)
+		cryFixture.sensor = true
+		
 		this.translate(position)
 		this.agentId = agentId
 		this.motionBehavior = motionBehavior

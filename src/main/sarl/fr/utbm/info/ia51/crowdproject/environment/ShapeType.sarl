@@ -23,46 +23,14 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
-import java.util.UUID
-import org.dyn4j.geometry.Convex
-import org.dyn4j.geometry.Vector2
-import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-
 /** 
- * Class defining the body of a hamster
+ * Enumeration used to know what kind of shape a fixture represents
  */
-class HamsterBody extends AgentBody {
-	
-	val MAX_LINEAR_VELOCITY = 100.0f
-	val MAX_LINEAR_ACCELERATION = 100.0f
-	val MAX_ANGULAR_VELOCITY = 30.0f
-	val MAX_ANGULAR_ACCELERATION = 30.0f
-	
-	new (shape : Convex,
-		frustrum : Convex,
-		cryRange : Convex,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, cryRange, agentId, motionBehavior)
-	}
-
-	new (shape : Convex,
-		frustrum : Convex,
-		cryRange : Convex,
-		position : Vector2,
-		agentId : UUID,
-		motionBehavior : MotionBehavior
-	) {
-		super(shape, frustrum, cryRange, position, agentId, motionBehavior)
-	}
-	
-	override getMaxLinearVelocity : float { MAX_LINEAR_VELOCITY }
-	
-	override getMaxLinearAcceleration : float { MAX_LINEAR_ACCELERATION }
-	
-	override getMaxAngularVelocity : float { MAX_ANGULAR_VELOCITY }
-	
-	override getMaxAngularAcceleration : float { MAX_ANGULAR_ACCELERATION }
-	
+enum ShapeType {
+	HAMSTER_BODY,
+	WALL,
+	FRUSTRUM,
+	NO_CRY,
+	POSITIVE_CRY,
+	WARNING_CRY
 }

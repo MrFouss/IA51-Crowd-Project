@@ -63,6 +63,8 @@ import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.geometry.Circle
 import org.dyn4j.geometry.Slice
+import java.util.TreeMap
+import org.dyn4j.collision.Fixture
 
 /** 
  * 
@@ -85,11 +87,9 @@ class FXMLViewerController implements Initializable, EventListener {
 	var worldDisplay : BorderPane
 
 	val id = UUID.randomUUID
-	var shapes = new ArrayList<Shape>
+	var shapes = new TreeMap<Fixture, Shape>
 
 	var openSpace : OpenEventSpace
-
-	var index = 0
 
 	def setOpenSpace(s : OpenEventSpace) {
 		this.openSpace = s
@@ -112,12 +112,10 @@ class FXMLViewerController implements Initializable, EventListener {
 			if (^event instanceof FrontEndEnvironmentChange) {
 				^event.objects.forEach[object | 
 					object.fixtures.forEach[fixture |
-						if ((fixture.userData as Integer) == -1) {
-							fixture.userData = this.index
-							shapes.add(createShape(object, fixture))
-							this.index++
+						if (!shapes.containsKey(fixture)) {
+							shapes.put(fixture, createShape(object, fixture))
 						} else {
-							val shape = shapes.get(fixture.userData as Integer)
+							val shape = shapes.get(fixture)
 							
 							// don't apply transforms if the object is not movable
 							if (object instanceof MobileBody)
@@ -128,13 +126,11 @@ class FXMLViewerController implements Initializable, EventListener {
 			} else if (^event instanceof FrontEndEnvironmentInitialization) {
 				^event.objects.forEach[object | 
 					object.fixtures.forEach[fixture |
-						fixture.userData = this.index
-						shapes.add(createShape(object, fixture))
-						this.index++
+						shapes.put(fixture, createShape(object, fixture))
 					]
 				]
 			}
-			worldDisplay.children.all = shapes
+			worldDisplay.children.all = shapes.values
 		}
 	}
 	

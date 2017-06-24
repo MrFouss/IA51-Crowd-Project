@@ -40,6 +40,7 @@ import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -73,11 +74,14 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		val body = new HamsterBody(
 			Geometry.createCircle(5.0f),
 			Geometry.createSlice(frustrumRadius, frustrumAngle),
+			Geometry.createCircle(100.0f),
 			UUID::randomUUID,
 			motionBehavior
 		)
-		body.getFixture(0).userData = -1
-		body.getFixture(1).userData = -1
+		body.getFixture(0).userData = ShapeType.HAMSTER_BODY
+		body.getFixture(1).userData = ShapeType.FRUSTRUM
+		body.getFixture(2).userData = ShapeType.NO_CRY
+		
 		body.translate(Math.random * 600 - 300, Math.random * 400 - 200)
 		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
@@ -104,16 +108,10 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
 			}
 			
-			if(action.isCrying) {
-				if (agentBody.fixtureCount < 3) {
-					var screamFixture = agentBody.addFixture(Geometry.createCircle(100.0f))
-					screamFixture.setSensor(true)
-					screamFixture.userData = -1;
-				}
-			} else {
-				if (agentBody.fixtureCount == 3) {
-					agentBody.removeFixture(2)
-				}
+			switch (agentBody.cry) {
+				case NONE: agentBody.getFixture(2).userData = ShapeType.NO_CRY
+				case POSITIVE: agentBody.getFixture(2).userData = ShapeType.POSITIVE_CRY
+				case WARNING: agentBody.getFixture(2).userData = ShapeType.WARNING_CRY
 			}
 		}
 	}
