@@ -48,6 +48,8 @@ import java.util.ArrayList
 import org.dyn4j.collision.Fixture
 import org.dyn4j.dynamics.StepAdapter
 import org.dyn4j.dynamics.Step
+import org.dyn4j.dynamics.contact.ContactAdapter
+import org.dyn4j.dynamics.contact.ContactPoint
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -73,33 +75,28 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				viewedBodies.clear	
 			}
 		})
-		this.world.addListener(new CollisionAdapter() {
+		this.world.addListener(new ContactAdapter() {
 			/* When the frustrum of an object intersect with an other object,
 			 it is added to the perceptions list */
-			override collision(body1 : Body, fixture1 : BodyFixture,
-				body2 : Body, fixture2 : BodyFixture, manifold : Manifold
-			) : boolean {
+			override sensed(point : ContactPoint) {
 				var seer : EnvironmentBody
 				var seen : EnvironmentBody
 				// We consider only bodies defined as EnvironmentBody
-				if (!EnvironmentBody.isInstance(body1) ||
-					 !EnvironmentBody.isInstance(body2)) {
-					return true
+				if (!EnvironmentBody.isInstance(point.body1) ||
+					 !EnvironmentBody.isInstance(point.body2)) {
+					return
 				}
-				// Checking if one fixture is a frustrum, and if yes wish one
-				if (fixture1.sensor) {
+				// Checking which fixture is a frustrum
+				if (point.fixture1.sensor) {
 					// We don't want frustrums to see other frustrums
-					if (fixture2.sensor) {
-						return false
+					if (point.fixture2.sensor) {
+						return
 					}
-					seer = body1 as EnvironmentBody
-					seen = body2 as EnvironmentBody
-				} else if (fixture2.sensor) {
-					seer = body2 as EnvironmentBody
-					seen = body1 as EnvironmentBody
+					seer = point.body1 as EnvironmentBody
+					seen = point.body2 as EnvironmentBody
 				} else {
-					// If none of them is a frustrum, normal collisions have to be applied
-					return true
+					seer = point.body2 as EnvironmentBody
+					seen = point.body1 as EnvironmentBody
 				}
 				// checking if the body already perceived an other body and adding the new one
 				var bodyList = viewedBodies.get(seer)
@@ -108,7 +105,6 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 					viewedBodies.put(seer, bodyList)
 				}
 				bodyList.add(seen)
-				return false;
 			}
 		})
 	}
@@ -205,6 +201,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		if (agentBody.deaf) {
 			val seens = viewedBodies.get(agentBody)
 			if (seens !== null) {
+				seens.sortBy[it.position.distance(agentBody.position)]
 				perceivedObjects.addAll(seens)				
 			}
 		}
