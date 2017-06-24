@@ -68,21 +68,27 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		lastNanoTime = System.nanoTime()
 		viewedBodies = new TreeMap<EnvironmentBody, LinkedList<EnvironmentBody>>
 		this.world.addListener(new StepAdapter() {
+			//  At the beginning of a step, we clear the list of view bodies
 			override begin(step : Step, world : World) {
 				viewedBodies.clear	
 			}
 		})
 		this.world.addListener(new CollisionAdapter() {
+			/* When the frustrum of an object intersect with an other object,
+			 it is added to the perceptions list */
 			override collision(body1 : Body, fixture1 : BodyFixture,
 				body2 : Body, fixture2 : BodyFixture, manifold : Manifold
 			) : boolean {
 				var seer : EnvironmentBody
 				var seen : EnvironmentBody
+				// We consider only bodies defined as EnvironmentBody
 				if (!EnvironmentBody.isInstance(body1) ||
 					 !EnvironmentBody.isInstance(body2)) {
 					return true
 				}
+				// Checking if one fixture is a frustrum, and if yes wish one
 				if (fixture1.sensor) {
+					// We don't want frustrums to see other frustrums
 					if (fixture2.sensor) {
 						return false
 					}
@@ -92,8 +98,10 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 					seer = body2 as EnvironmentBody
 					seen = body1 as EnvironmentBody
 				} else {
+					// If none of them is a frustrum, normal collisions have to be applied
 					return true
 				}
+				// checking if the body already perceived an other body and adding the new one
 				var bodyList = viewedBodies.get(seer)
 				if (bodyList === null) {
 					bodyList = new LinkedList<EnvironmentBody>()
