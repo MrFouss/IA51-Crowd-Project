@@ -24,10 +24,11 @@
 package fr.utbm.info.ia51.crowdproject.^agent
 
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.LevelDesign
 import fr.utbm.info.ia51.crowdproject.environment.Levels
-import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
+import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.core.Destroy
@@ -41,7 +42,6 @@ import java.util.Random
 import java.util.TreeMap
 import java.util.UUID
 import org.dyn4j.geometry.Vector2
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 
 /**
  * The environment agent, managing all the other agents

@@ -72,7 +72,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		frustrumAngle : float
 	) : HamsterBody {
 		val body = new HamsterBody(
-			Geometry.createCircle(5.0f),
+			Geometry.createCircle(15.0f),
 			Geometry.createSlice(frustrumRadius, frustrumAngle),
 			Geometry.createCircle(100.0f),
 			UUID::randomUUID,

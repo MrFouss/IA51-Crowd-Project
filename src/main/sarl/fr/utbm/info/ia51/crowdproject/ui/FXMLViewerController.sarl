@@ -29,6 +29,7 @@ import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.janusproject.Boot
 import io.sarl.lang.core.Address
@@ -38,6 +39,7 @@ import io.sarl.util.OpenEventSpace
 import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
+import java.util.HashMap
 import java.util.Optional
 import java.util.ResourceBundle
 import java.util.UUID
@@ -51,19 +53,24 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Dialog
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.image.Image
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
+import javafx.scene.paint.CycleMethod
+import javafx.scene.paint.ImagePattern
+import javafx.scene.paint.RadialGradient
+import javafx.scene.paint.Stop
 import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.Rectangle
 import javafx.scene.shape.Shape
 import javafx.scene.transform.Rotate
+import org.dyn4j.collision.Fixture
 import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
-import org.dyn4j.collision.Fixture
-import fr.utbm.info.ia51.crowdproject.environment.ShapeType
-import java.util.HashMap
+import org.dyn4j.geometry.Circle
+import org.dyn4j.geometry.Slice
 
 /** 
  * 
@@ -84,6 +91,8 @@ class FXMLViewerController implements Initializable, EventListener {
 
 	@FXML
 	var worldDisplay : BorderPane
+
+	var hamsterIm = new Image(getClass().getResource("hamster-ball.png").toString)
 
 	val id = UUID.randomUUID
 	val shapes = new HashMap<Fixture, Shape>
@@ -148,10 +157,21 @@ class FXMLViewerController implements Initializable, EventListener {
 	 */
 	private def createShape(object : Body, fixture : BodyFixture) : Shape {
 		
-		if (fixture.shape instanceof org.dyn4j.geometry.Circle) {
-			val g = fixture.shape as org.dyn4j.geometry.Circle
+		if (fixture.shape instanceof Circle &&
+			fixture.userData as ShapeType == ShapeType.HAMSTER_BODY
+		) {
+			val g = fixture.shape as Circle
+			val rectangle = new Rectangle(
+				object.worldCenter.x - g.radius + WIDTH / 2,
+				object.worldCenter.y - g.radius + HEIGHT / 2,
+				g.radius * 2,
+				g.radius * 2)
+			return rectangle
+
+		} else if (fixture.shape instanceof Circle) {
+			val g = fixture.shape as Circle
 			val circle = new javafx.scene.shape.Circle(
-				object.worldCenter.x + WIDTH /2,
+				object.worldCenter.x + WIDTH / 2,
 				object.worldCenter.y + HEIGHT / 2,
 				g.radius)
 			return circle
@@ -167,8 +187,8 @@ class FXMLViewerController implements Initializable, EventListener {
 				g.height)
 			return rectangle
 
-		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
-			val g = fixture.shape as org.dyn4j.geometry.Slice
+		} else if (fixture.shape instanceof Slice) {
+			val g = fixture.shape as Slice
 			val angle = Math.toDegrees(g.theta)
 			
 			var arc = new Arc()
@@ -195,8 +215,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	private def updateColor(shape : Shape, shapeType : ShapeType) {
 		switch (shapeType) {
 			case HAMSTER_BODY: {
-				shape.fill = Color.BROWN
-				shape.stroke = Color.CHOCOLATE
+				shape.fill = new ImagePattern(hamsterIm)
 			}
 			case WALL: {
 				shape.fill = Color.BLACK
@@ -209,22 +228,38 @@ class FXMLViewerController implements Initializable, EventListener {
 			case BEACON_BODY: {
 				shape.fill = Color.DARKCYAN
 				shape.stroke = Color.CYAN
+				shape.toFront
 			}
 			case TARGET_SOUND: {
-				shape.fill = Color.TRANSPARENT
-				shape.stroke = Color.GOLD
+				shape.fill = new RadialGradient(
+					0, 0, 0.5, 0.5, 0.5,
+					true,
+					CycleMethod.NO_CYCLE,
+					new Stop(1, Color.TRANSPARENT),
+					new Stop(0, Color.GOLD))
+				shape.toBack
 			}
 			case NO_CRY: {
 				shape.fill = Color.TRANSPARENT
 				shape.stroke = if(visualDebug) Color.GRAY else Color.TRANSPARENT
 			}
 			case POSITIVE_CRY: {
-				shape.fill = Color.TRANSPARENT
-				shape.stroke = Color.GREEN
+				shape.fill = new RadialGradient(
+					0, 0, 0.5, 0.5, 0.5,
+					true,
+					CycleMethod.NO_CYCLE,
+					new Stop(1, Color.TRANSPARENT),
+					new Stop(0, Color.GREEN))
+				shape.toBack
 			}
 			case WARNING_CRY: {
-				shape.fill = Color.TRANSPARENT
-				shape.stroke = Color.RED
+				shape.fill = new RadialGradient(
+					0, 0, 0.5, 0.5, 0.5,
+					true,
+					CycleMethod.NO_CYCLE,
+					new Stop(1, Color.TRANSPARENT),
+					new Stop(0, Color.RED))
+				shape.toBack
 			}
 		}
 	}
@@ -238,7 +273,15 @@ class FXMLViewerController implements Initializable, EventListener {
 	 */
 	private def transform(shape : Shape, object : MobileBody, fixture : BodyFixture) {
 		
-		if (fixture.shape instanceof org.dyn4j.geometry.Circle) {
+		if (fixture.shape instanceof Circle &&
+			fixture.userData as ShapeType == ShapeType.HAMSTER_BODY) {
+			var g = fixture.shape as Circle
+			var s = shape as Rectangle
+			s.x = object.worldCenter.x - g.radius + WIDTH / 2
+			s.y = object.worldCenter.y - g.radius + HEIGHT / 2
+			s.rotate = Math.toDegrees(object.orientation)
+
+		} else if (fixture.shape instanceof Circle) {
 			var s = shape as javafx.scene.shape.Circle
 			s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2
 			s.translateY = object.worldCenter.y - s.centerY + HEIGHT / 2
@@ -250,7 +293,7 @@ class FXMLViewerController implements Initializable, EventListener {
 			s.x = object.worldCenter.x - g.width / 2 + WIDTH / 2
 			s.y = object.worldCenter.y + HEIGHT / 2
 			
-		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
+		} else if (fixture.shape instanceof Slice) {
 			var s = shape as Arc
 			s.centerX = object.worldCenter.x + WIDTH / 2
 			s.centerY = object.worldCenter.y + HEIGHT / 2
