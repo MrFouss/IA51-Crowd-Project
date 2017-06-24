@@ -74,7 +74,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	public static val HEIGHT = 600.0f
 
 	public static val NB_HAMSTERS = 10
-	public static val FRUSTRUM_RADIUS = 50.0f
+	public static val FRUSTRUM_RADIUS = 75.0f
 	public static val FRUSTRUM_ANGLE = Math.PI.floatValue / 4.0f
 
 	public static var motionBehavior = MotionBehavior::KINEMATIC
