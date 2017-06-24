@@ -23,34 +23,33 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
-import org.dyn4j.geometry.Vector2
-import org.dyn4j.dynamics.Body
 import org.dyn4j.geometry.Geometry
+import fr.utbm.info.ia51.crowdproject.motion.CryType
+import org.dyn4j.geometry.Convex
 
 /** 
  * Abstract definition of an object emitting a sound
  */
-abstract class SoundSource extends Body {
+abstract class StaticSoundSource extends StaticBody {
 	
 	val SOUND_SPEED = 3.0f
 
-	val position : Vector2
 	val range : float 
 	val lifespan : double
 	var timeElapsed = 0.0
-
-	new (position : Vector2, range : float) {
-		this.position = position
-		this.lifespan = Double.POSITIVE_INFINITY
-		this.range = range
-		val newFixture = this.addFixture(Geometry.createCircle(range))
-		newFixture.sensor = true
-	}
+	val soundType : CryType
 	
-	new (position : Vector2, range : float, lifespan : double) {
-		this.position = position
+	new (shape : Convex, soundType : CryType, range : float, lifespan : double) {
+		super(shape)
+		
+		this.soundType = soundType
 		this.lifespan = lifespan
 		this.range = range
+
+		this.getFixture(0).userData = ShapeType.BEACON_BODY
+		
+		this.addFixture(Geometry.createCircle(range))
+		this.getFixture(1).sensor = true
 	}
 	
 	def getMinRange : float {
@@ -74,5 +73,13 @@ abstract class SoundSource extends Body {
 	 */
 	def isActive : boolean {
 		return (timeElapsed - lifespan) < (range / SOUND_SPEED)
+	}
+
+	/**
+	 * Updates the sound source time elapsed, and returns <code>true</code> if the sound source is still active
+	 */
+	def update : boolean {
+		this.timeElapsed++
+		return this.isActive
 	}
 }

@@ -23,24 +23,20 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
-import org.dyn4j.geometry.MassType
-import org.dyn4j.geometry.Convex
-import java.awt.Color
+import fr.utbm.info.ia51.crowdproject.motion.CryType
+import org.dyn4j.geometry.Vector2
+import org.dyn4j.geometry.Geometry
 
 /** 
  * 
  */
-class StaticBody extends EnvironmentBody {
-	
-	new (shape : Convex) {
-		super(shape, MassType.INFINITE)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
-	}
+class TargetBody extends StaticSoundSource {
 
-	new (shape : Convex, color : Color) {
-		super(shape, MassType.INFINITE, color)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
+	new (position : Vector2) {
+		super(Geometry.createRectangle(20, 20), CryType.POSITIVE, 150.0f, Double.POSITIVE_INFINITY)
+		
+		this.getFixture(1).userData = ShapeType.TARGET_SOUND
+		
+		this.translate(position)
 	}
 }

@@ -26,7 +26,7 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.lang.core.Address
 import java.util.Collection
@@ -40,16 +40,12 @@ import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import org.dyn4j.dynamics.CollisionAdapter
-import org.dyn4j.dynamics.Body
-import org.dyn4j.dynamics.BodyFixture
-import org.dyn4j.collision.manifold.Manifold
-import java.util.ArrayList
-import org.dyn4j.collision.Fixture
 import org.dyn4j.dynamics.StepAdapter
 import org.dyn4j.dynamics.Step
 import org.dyn4j.dynamics.contact.ContactAdapter
 import org.dyn4j.dynamics.contact.ContactPoint
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -82,29 +78,35 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				var seer : EnvironmentBody
 				var seen : EnvironmentBody
 				// We consider only bodies defined as EnvironmentBody
-				if (!EnvironmentBody.isInstance(point.body1) ||
-					 !EnvironmentBody.isInstance(point.body2)) {
-					return
+				if (EnvironmentBody.isInstance(point.body1) &&
+					 EnvironmentBody.isInstance(point.body2)) {
+					if (StaticSoundSource.isInstance(point.body1) ||
+						 StaticSoundSource.isInstance(point.body2)
+					) {
+						
+					} else {
+						// Checking which fixture is a frustrum
+						if (point.fixture1.sensor) {
+						// We don't want frustrums to see other frustrums
+							if (point.fixture2.sensor) {
+								return
+							}
+							seer = point.body1 as EnvironmentBody
+							seen = point.body2 as EnvironmentBody
+						} else {
+							seer = point.body2 as EnvironmentBody
+							seen = point.body1 as EnvironmentBody
+						}
+					
+					// checking if the body already perceived an other body and adding the new one
+						var bodyList = viewedBodies.get(seer)
+						if (bodyList === null) {
+							bodyList = new LinkedList<EnvironmentBody>()
+							viewedBodies.put(seer, bodyList)
+						}
+						bodyList.add(seen)
+					}		
 				}
-				// Checking which fixture is a frustrum
-				if (point.fixture1.sensor) {
-					// We don't want frustrums to see other frustrums
-					if (point.fixture2.sensor) {
-						return
-					}
-					seer = point.body1 as EnvironmentBody
-					seen = point.body2 as EnvironmentBody
-				} else {
-					seer = point.body2 as EnvironmentBody
-					seen = point.body1 as EnvironmentBody
-				}
-				// checking if the body already perceived an other body and adding the new one
-				var bodyList = viewedBodies.get(seer)
-				if (bodyList === null) {
-					bodyList = new LinkedList<EnvironmentBody>()
-					viewedBodies.put(seer, bodyList)
-				}
-				bodyList.add(seen)
 			}
 		})
 	}
@@ -115,20 +117,22 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param motionBehavior the world's motion behavior
 	 * @param frustrumRadius the distance of perception of the hamster
 	 * @param frustrumAngle the radius of the frustrum of the hamster
-	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
 	def createHamster(motionBehavior : MotionBehavior,
 		frustrumRadius : float,
-		frustrumAngle : float,
-		isDeaf : boolean
+		frustrumAngle : float
 	) : HamsterBody {
 		val body = new HamsterBody(
 			Geometry.createCircle(5.0f),
 			Geometry.createSlice(frustrumRadius, frustrumAngle),
-			isDeaf,
+			Geometry.createCircle(100.0f),
 			UUID::randomUUID,
 			motionBehavior
 		)
+		body.getFixture(0).userData = ShapeType.HAMSTER_BODY
+		body.getFixture(1).userData = ShapeType.FRUSTRUM
+		body.getFixture(2).userData = ShapeType.NO_CRY
+		
 		body.translate(Math.random * 600 - 300, Math.random * 400 - 200)
 		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
@@ -141,7 +145,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param actions the list of actions to apply
 	 * @param agentBodies the list of agent bodies
 	 */
-	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
+	def applyActions(actions : List<ActionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			
@@ -153,6 +157,12 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				agentBody.applyTorque(action.angular)
 			} else {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
+			}
+			
+			switch (agentBody.cry) {
+				case NONE: agentBody.getFixture(2).userData = ShapeType.NO_CRY
+				case POSITIVE: agentBody.getFixture(2).userData = ShapeType.POSITIVE_CRY
+				case WARNING: agentBody.getFixture(2).userData = ShapeType.WARNING_CRY
 			}
 		}
 	}
@@ -198,12 +208,10 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def getVisualPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
 		val perceivedObjects = new LinkedList<EnvironmentBody>
 
-		if (agentBody.deaf) {
-			val seens = viewedBodies.get(agentBody)
-			if (seens !== null) {
-				seens.sortBy[it.position.distance(agentBody.position)]
-				perceivedObjects.addAll(seens)				
-			}
+		val seens = viewedBodies.get(agentBody)
+		if (seens !== null) {
+			seens.sortBy[it.position.distance(agentBody.position)]
+			perceivedObjects.addAll(seens)				
 		}
 		
 		return perceivedObjects
@@ -232,7 +240,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		this.lastNanoTime = thisNanoTime
 		world.update(timeDiff / 1.0e9)
 	}
-
+	
 	/**
 	 * Getter of the world
 	 * 
@@ -276,7 +284,7 @@ skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	 * @param time the time at which the movement query is sent
 	 * @param motion data about the path to follow
 	 */
-	def move(agentId : UUID, environmentAddress : Address, time : long, motion : MotionQuery) {
+	def move(agentId : UUID, environmentAddress : Address, time : long, motion : ActionQuery) {
 		emit(new Action(agentId, time, motion))
 			[it == environmentAddress]
 	}

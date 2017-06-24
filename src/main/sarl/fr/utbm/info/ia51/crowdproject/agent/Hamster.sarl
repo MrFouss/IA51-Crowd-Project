@@ -25,7 +25,7 @@ package fr.utbm.info.ia51.crowdproject.^agent
 
 import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
 import io.sarl.core.Destroy
@@ -38,12 +38,12 @@ import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 /**
  * The hamster agent
  */
 agent Hamster extends Animat {
-
 	var wanderBehavior : WanderAlgorithm
 	var seekBehavior : SeekAlgorithm
 	var fleeBehavior : FleeAlgorithm
@@ -66,15 +66,15 @@ agent Hamster extends Animat {
 			this.fleeBehavior = new SteeringFleeAlgorithm
 		}
 	}
-
+	
 	on Destroy {
 		info("A hamster has been killed")
 	}
 	
 	on Perception [it.agentId == this.agentId] {
 		synchronized(this) {
-			var computedMotion : MotionQuery
 			var firstSeen = occurrence.objects.findFirst[HamsterBody.isInstance(it)]
+			var computedMotion : ActionQuery
 			
 			// If the target has been perceived
 			if (firstSeen !== null) {
@@ -93,6 +93,7 @@ agent Hamster extends Animat {
 					occurrence.agentBody.maxAngular
 				)
 			}
+			computedMotion.cry = CryType.POSITIVE
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
 		}

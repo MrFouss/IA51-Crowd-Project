@@ -23,24 +23,16 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
-import org.dyn4j.geometry.MassType
-import org.dyn4j.geometry.Convex
-import java.awt.Color
-
 /** 
- * 
+ * Enumeration used to know what kind of shape a fixture represents
  */
-class StaticBody extends EnvironmentBody {
-	
-	new (shape : Convex) {
-		super(shape, MassType.INFINITE)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
-	}
-
-	new (shape : Convex, color : Color) {
-		super(shape, MassType.INFINITE, color)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
-	}
+enum ShapeType {
+	HAMSTER_BODY,
+	WALL,
+	FRUSTRUM,
+	BEACON_BODY,
+	TARGET_SOUND,
+	NO_CRY,
+	POSITIVE_CRY,
+	WARNING_CRY
 }

@@ -23,24 +23,31 @@
  */
 package fr.utbm.info.ia51.crowdproject.environment
 
-import org.dyn4j.geometry.MassType
-import org.dyn4j.geometry.Convex
-import java.awt.Color
+import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.CryType
+import org.dyn4j.geometry.Geometry
 
 /** 
  * 
  */
-class StaticBody extends EnvironmentBody {
+class SoundBeaconBody extends StaticSoundSource {
 	
-	new (shape : Convex) {
-		super(shape, MassType.INFINITE)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
-	}
+	new (soundType : CryType, position : Vector2) {
+		
+		super(Geometry.createCircle(10), soundType, 100.0f, Double.POSITIVE_INFINITY)
+		
+		switch (soundType) {
+			case POSITIVE: {
+				this.getFixture(1).userData = ShapeType.POSITIVE_CRY
+			}
+			case WARNING: {
+				this.getFixture(1).userData = ShapeType.WARNING_CRY
+			}
+			case NONE: {
+				throw new EnumConstantNotPresentException(CryType, "NONE constant not supported")
+			}
+		}
 
-	new (shape : Convex, color : Color) {
-		super(shape, MassType.INFINITE, color)
-		this.getFixture(0).friction = 0.0
-		this.getFixture(0).restitution = 1.0
+		this.translate(position)
 	}
 }
