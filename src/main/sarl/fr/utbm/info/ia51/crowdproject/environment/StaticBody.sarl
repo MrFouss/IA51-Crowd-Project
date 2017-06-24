@@ -34,9 +34,13 @@ class StaticBody extends EnvironmentBody {
 	
 	new (shape : Convex) {
 		super(shape, MassType.INFINITE)
+		this.getFixture(0).friction = 0.0
+		this.getFixture(0).restitution = 1.0
 	}
 
 	new (shape : Convex, color : Color) {
 		super(shape, MassType.INFINITE, color)
+		this.getFixture(0).friction = 0.0
+		this.getFixture(0).restitution = 1.0
 	}
 }

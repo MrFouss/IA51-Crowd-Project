@@ -85,6 +85,11 @@ agent Environment {
 		for(s : this.levelDesign.staticBodies) {
 			world.addBody(s)
 		}
+
+		// Add sound sources to the world
+		for (s : this.levelDesign.soundSources) {
+			world.addBody(s)
+		}
 	
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
