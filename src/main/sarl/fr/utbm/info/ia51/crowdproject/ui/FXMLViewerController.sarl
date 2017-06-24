@@ -61,10 +61,9 @@ import javafx.scene.shape.Shape
 import javafx.scene.transform.Rotate
 import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
-import org.dyn4j.geometry.Circle
-import org.dyn4j.geometry.Slice
-import java.util.TreeMap
 import org.dyn4j.collision.Fixture
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import java.util.HashMap
 
 /** 
  * 
@@ -87,7 +86,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	var worldDisplay : BorderPane
 
 	val id = UUID.randomUUID
-	var shapes = new TreeMap<Fixture, Shape>
+	val shapes = new HashMap<Fixture, Shape>
 
 	var openSpace : OpenEventSpace
 
@@ -110,27 +109,33 @@ class FXMLViewerController implements Initializable, EventListener {
 	override receiveEvent(^event : Event) {
 		synchronized(this) {
 			if (^event instanceof FrontEndEnvironmentChange) {
-				^event.objects.forEach[object | 
-					object.fixtures.forEach[fixture |
+				for (object : ^event.objects) {
+					for (fixture : object.fixtures) {
 						if (!shapes.containsKey(fixture)) {
-							shapes.put(fixture, createShape(object, fixture))
+							var newShape = createShape(object, fixture)
+							updateColor(newShape, fixture.userData as ShapeType)
+							shapes.put(fixture, newShape)
 						} else {
 							val shape = shapes.get(fixture)
+
+							updateColor(shape, fixture.userData as ShapeType)
 							
 							// don't apply transforms if the object is not movable
 							if (object instanceof MobileBody)
 								shape.transform(object, fixture)
 						}
-					]
-				]
+					}
+				}
 			} else if (^event instanceof FrontEndEnvironmentInitialization) {
-				^event.objects.forEach[object | 
-					object.fixtures.forEach[fixture |
-						shapes.put(fixture, createShape(object, fixture))
-					]
-				]
+				for (object : ^event.objects) {
+					for (fixture : object.fixtures) {
+						var newShape = createShape(object, fixture)
+						updateColor(newShape, fixture.userData as ShapeType)
+						shapes.put(fixture, newShape)
+					}
+				}
 			}
-			worldDisplay.children.all = shapes.values
+			worldDisplay.children.all = new ArrayList(shapes.values)
 		}
 	}
 	
@@ -142,13 +147,13 @@ class FXMLViewerController implements Initializable, EventListener {
 	 * @return the newly created JavaFX shape
 	 */
 	private def createShape(object : Body, fixture : BodyFixture) : Shape {
-		if (fixture.shape instanceof Circle) {
-			val g = fixture.shape as Circle
+		
+		if (fixture.shape instanceof org.dyn4j.geometry.Circle) {
+			val g = fixture.shape as org.dyn4j.geometry.Circle
 			val circle = new javafx.scene.shape.Circle(
 				object.worldCenter.x + WIDTH /2,
 				object.worldCenter.y + HEIGHT / 2,
 				g.radius)
-				
 			return circle
 
 		} else if (fixture.shape instanceof org.dyn4j.geometry.Rectangle) {
@@ -160,11 +165,10 @@ class FXMLViewerController implements Initializable, EventListener {
 				object.worldCenter.y - g.height / 2 + HEIGHT / 2,
 				g.width,
 				g.height)
-
 			return rectangle
 
-		} else if (fixture.shape instanceof Slice) {
-			val g = fixture.shape as Slice
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
+			val g = fixture.shape as org.dyn4j.geometry.Slice
 			val angle = Math.toDegrees(g.theta)
 			
 			var arc = new Arc()
@@ -175,38 +179,70 @@ class FXMLViewerController implements Initializable, EventListener {
 			arc.startAngle = object.transform.rotation - (angle / 2.0f)
 			arc.length = angle
 			arc.type = ArcType.ROUND
-			
-			arc.fill = null
-			if(visualDebug)
-			arc.stroke = Color.BLUE
-			else
-			arc.stroke = Color.TRANSPARENT
-			
 			return arc
+			
 		} else {
 			throw new GeometryConversionException("The shape \"" + fixture.class.toString + "\" can't handled.")
 		}
 	}
+	
+	/**
+	 * Updates the color of the shape
+	 * 
+	 * @param shape the shape to update
+	 * @param shapeType the type of the shape displayed
+	 */
+	private def updateColor(shape : Shape, shapeType : ShapeType) {
+		switch (shapeType) {
+			case HAMSTER_BODY: {
+				shape.fill = Color.BROWN
+				shape.stroke = Color.CHOCOLATE
+			}
+			case FRUSTRUM: {
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = if(visualDebug) Color.BLUE else Color.TRANSPARENT
+			}
+			case WALL: {
+				shape.fill = Color.BLACK
+				shape.stroke = Color.GRAY
+			}
+			case NO_CRY: {
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = if(visualDebug) Color.GRAY else Color.TRANSPARENT
+			}
+			case POSITIVE_CRY: {
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.GREEN
+			}
+			case WARNING_CRY: {
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.RED
+			}
+		}
+	}
 
 	/** 
-	 * Used to transform the JavaFx shapes from dyn4j shapes
+	 * Used to apply a transformation on the JavaFx shapes
 	 * 
+	 * @param shape the JavaFX shape to transform
 	 * @param object an environmentBody that needs to have a dyn4j shape
 	 * @param fixture a fixture of the object
-	 * @return the newly created JavaFX shape
 	 */
 	private def transform(shape : Shape, object : MobileBody, fixture : BodyFixture) {
-		if (fixture.shape instanceof Circle) {
+		
+		if (fixture.shape instanceof org.dyn4j.geometry.Circle) {
 			var s = shape as javafx.scene.shape.Circle
 			s.translateX = object.worldCenter.x - s.centerX + WIDTH / 2
 			s.translateY = object.worldCenter.y - s.centerY + HEIGHT / 2
 			s.rotate = Math.toDegrees(object.orientation)
+			
 		} else if (fixture.shape instanceof org.dyn4j.geometry.Rectangle) {
 			var g = fixture.shape as org.dyn4j.geometry.Rectangle
 			var s = shape as Rectangle
 			s.x = object.worldCenter.x - g.width / 2 + WIDTH / 2
 			s.y = object.worldCenter.y + HEIGHT / 2
-		} else if (fixture.shape instanceof Slice) {
+			
+		} else if (fixture.shape instanceof org.dyn4j.geometry.Slice) {
 			var s = shape as Arc
 			s.centerX = object.worldCenter.x + WIDTH / 2
 			s.centerY = object.worldCenter.y + HEIGHT / 2
@@ -269,10 +305,9 @@ class FXMLViewerController implements Initializable, EventListener {
 				motionBehavior = MotionBehavior::KINEMATIC
 			else
 				motionBehavior = MotionBehavior::STEERING
+				
 			nbHamster = if(config.get(1) != "") Integer.valueOf(config.get(1)) else NB_HAMSTERS
-			
 			levelDesign = levelBox.getValue
-
 			visualDebug = debugBox.isSelected
 
 			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, motionBehavior,
