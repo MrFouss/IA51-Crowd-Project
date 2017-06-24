@@ -21,52 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package fr.utbm.info.ia51.crowdproject.motion
-
-import java.util.UUID
-import org.dyn4j.geometry.Vector2
+package fr.utbm.info.ia51.crowdproject.environment
 
 /** 
- * Abstract definition of the wandering motion behavior
+ * Enumeration used to know what kind of shape a fixture represents
  */
-interface WanderAlgorithm {
-
-	def run(emitter : UUID,
-		orientation : double,
-		maxLinear : float,
-		maxAngular : float
-	) : ActionQuery
-}
-
-/** 
- * Abstract definition of the seeking motion behavior
- */
-interface SeekAlgorithm {
-
-	val SLOW_DOWN_DISTANCE = 50.0f
-	val SLOW_DOWN_ANGLE = Math.PI / 4
-
-	def run(
-		emitter : UUID,
-		orientation : double,
-		targetPosition : Vector2,
-		maxLinear : float,
-		maxAngular : float
-	) : ActionQuery
-}
-
-/** 
- * Abstract definition of the fleeing motion behavior
- */
-interface FleeAlgorithm {
-
-	val SLOW_DOWN_ANGLE = Math.PI / 4
-
-	def run(
-		emitter : UUID,
-		orientation : double,
-		targetPosition : Vector2,
-		maxLinear : float,
-		maxAngular : float
-	) : ActionQuery
+enum ShapeType {
+	HAMSTER_BODY,
+	WALL,
+	FRUSTRUM,
+	BEACON_BODY,
+	TARGET_SOUND,
+	NO_CRY,
+	POSITIVE_CRY,
+	WARNING_CRY
 }

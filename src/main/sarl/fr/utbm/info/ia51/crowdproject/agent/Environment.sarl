@@ -26,9 +26,8 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.LevelDesign
 import fr.utbm.info.ia51.crowdproject.environment.Levels
-import fr.utbm.info.ia51.crowdproject.environment.SoundSource
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.core.Destroy
@@ -41,21 +40,20 @@ import java.util.LinkedList
 import java.util.Random
 import java.util.TreeMap
 import java.util.UUID
-import org.dyn4j.dynamics.Body
 import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 
 /**
  * The environment agent, managing all the other agents
  */
 agent Environment {
-	
+
 	uses Logging, Lifecycle, DefaultContextInteractions, EnvironmentManager, EnvironmentFrontEnd
 
 	val agentBodies = new TreeMap<UUID, AgentBody>
-	val soundSources = new LinkedList<SoundSource>
 	var levelDesign : LevelDesign
 	
-	val actions = new LinkedList<MotionQuery>
+	val actions = new LinkedList<ActionQuery>
 	var targetPosition : Vector2
 
 	var motionBehavior : MotionBehavior
@@ -87,11 +85,11 @@ agent Environment {
 		for(s : this.levelDesign.staticBodies) {
 			world.addBody(s)
 		}
-		
+	
 		// Spawn hamsters
 		for (i : 0 ..< nbHamsters) {
 			var isDeaf = random.nextBoolean
-			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 5.0f, frustrumAngle, isDeaf)
+			var agentBody = createHamster(motionBehavior, if(isDeaf) frustrumRadius else 5.0f, frustrumAngle)
 			agentBodies.put(agentBody.agentId, agentBody)
 			var params = new ArrayList<Object>
 			params += #[agentBody.agentId, motionBehavior]
@@ -100,10 +98,10 @@ agent Environment {
 		
 		info("Number of bodies in the world: " + world.bodyCount)
 		
-		val totalListOfBodies = new ArrayList<Body>
+		val totalListOfBodies = new ArrayList<EnvironmentBody>
 		totalListOfBodies += agentBodies.values
 		totalListOfBodies += levelDesign.staticBodies
-		totalListOfBodies += soundSources
+		totalListOfBodies += levelDesign.soundSources
 		emit(new FrontEndEnvironmentInitialization(totalListOfBodies))
 		
 		emit(new RunBeginningOfStep) [it.isMe]
@@ -134,7 +132,7 @@ agent Environment {
 			}
 		}
 	}
-
+	
 	on RunEndOfStep {
 		synchronized (this) {
 			// Eventually take into account the actions of the player
@@ -150,11 +148,20 @@ agent Environment {
 				killMe
 			}
 			
+			val soundSourcesToRemove = new ArrayList<EnvironmentBody>
+			this.levelDesign.soundSources.forEach[soundSource |
+				if (!soundSource.update) {
+					soundSourcesToRemove += soundSource
+				}
+			]
+			this.levelDesign.soundSources.removeAll(soundSourcesToRemove)
+			emit(new FrontEndEnvironmentClean(soundSourcesToRemove))
+			
 			// Informs the view that a front end update is needed
-			val bodiesToVisuallyUpdate = new ArrayList<Body>()
+			val bodiesToVisuallyUpdate = new ArrayList<EnvironmentBody>()
 			bodiesToVisuallyUpdate += (agentBodies.values)
-			bodiesToVisuallyUpdate += soundSources
-			emit(new FrontEndEnvironmentChange(new ArrayList(agentBodies.values)))
+			bodiesToVisuallyUpdate += this.levelDesign.soundSources
+			emit(new FrontEndEnvironmentChange(bodiesToVisuallyUpdate))
 			Thread.sleep(100/6)
 			
 			// Increase time value

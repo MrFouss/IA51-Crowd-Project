@@ -27,22 +27,31 @@ package fr.utbm.info.ia51.crowdproject.environment
 import java.awt.Color
 import java.util.LinkedList
 import org.dyn4j.geometry.Geometry
+import org.dyn4j.geometry.Vector2
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 class LevelDesign {
 	val level : Levels
 	val width : float
 	val height : float
+	
 	var staticBodies = new LinkedList<StaticBody>
+	var soundSources = new LinkedList<StaticSoundSource>
 	
 	new(level : Levels, width : float, height : float) {
 		this.level = level
 		this.width = width
 		this.height = height
 		createStaticBodies
+		createSoundSources
 	}
 
 	def getStaticBodies : LinkedList<StaticBody> {
 		return staticBodies
+	}
+
+	def getSoundSources : LinkedList<StaticSoundSource> {
+		return soundSources
 	}
 	
 	def createStaticBodies {
@@ -51,38 +60,44 @@ class LevelDesign {
 		topWall.getFixture(0).setRestitution(0.5)
 		topWall.translate(0, -height / 2 + 3)
 		this.staticBodies += topWall
-
+		topWall.getFixture(0).userData = ShapeType.WALL
+		
 		// Spawn bottom wall
 		val bottomWall = new StaticBody(Geometry.createRectangle(width, 6), Color.GRAY)
 		bottomWall.getFixture(0).setRestitution(0.5)
 		bottomWall.translate(0, height / 2 - 3)
 		this.staticBodies += bottomWall
+		bottomWall.getFixture(0).userData = ShapeType.WALL
 
 		// Spawn left wall
 		val leftWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		leftWall.getFixture(0).setRestitution(0.5)
 		leftWall.translate(-width / 2 + 3, 0)
 		this.staticBodies += leftWall
+		leftWall.getFixture(0).userData = ShapeType.WALL
 
 		// Spawn right wall
 		val rightWall = new StaticBody(Geometry.createRectangle(6, height), Color.GRAY)
 		rightWall.getFixture(0).setRestitution(0.5)
 		rightWall.translate(width / 2 - 3, 0)
 		this.staticBodies += rightWall
+		rightWall.getFixture(0).userData = ShapeType.WALL
 		
 		switch (this.level) {
 			case BASIC: {
-					// Spawn middle wall
-					val midWall = new StaticBody(Geometry.createRectangle(6, height / 2), Color.GRAY)
-					midWall.getFixture(0).setRestitution(0.5)
-					midWall.translate(0, 0)
-					this.staticBodies += midWall
-				}
-			
+				// Spawn middle wall
+				val midWall = new StaticBody(Geometry.createRectangle(6, height / 2), Color.GRAY)
+				midWall.getFixture(0).setRestitution(0.5)
+				midWall.getFixture(0).userData = ShapeType.WALL
+				midWall.translate(0, 0)
+				this.staticBodies += midWall
+			}
+		
 			case PARALLELISM: {
 				// Spawn half top wall
 				val aWall = new StaticBody(Geometry.createRectangle(width / 2, 6), Color.GRAY)
 				aWall.getFixture(0).setRestitution(0.5)
+				aWall.getFixture(0).userData = ShapeType.WALL
 				aWall.translate(0, height / 4)
 				this.staticBodies += aWall
 
@@ -91,10 +106,37 @@ class LevelDesign {
 				bWall.getFixture(0).setRestitution(0.5)
 				bWall.translate(0, -height / 4)
 				this.staticBodies += bWall
-			}
-			default: {
-				
+				bWall.getFixture(0).userData = ShapeType.WALL
 			}
 		}
-	}	
+	}
+
+	def createSoundSources {
+
+		switch (this.level) {
+			case BASIC: {
+				// Spawn target
+				val target = new TargetBody(new Vector2(0.0f, -200.0f))
+				this.soundSources += target
+				
+				val beacon1 = new SoundBeaconBody(CryType.POSITIVE, new Vector2(-200.0f, 0.0f))
+				this.soundSources += beacon1
+
+				val beacon2 = new SoundBeaconBody(CryType.WARNING, new Vector2(200.0f, 0.0f))
+				this.soundSources += beacon2
+			}
+			
+			case PARALLELISM: {
+				// Spawn target
+				val target = new TargetBody(new Vector2(0.0f, -200.0f))
+				this.soundSources += target
+
+				val beacon1 = new SoundBeaconBody(CryType.POSITIVE, new Vector2(-200.0f, 0.0f))
+				this.soundSources += beacon1
+
+				val beacon2 = new SoundBeaconBody(CryType.WARNING, new Vector2(200.0f, 0.0f))
+				this.soundSources += beacon2
+			}
+		}
+	}
 }

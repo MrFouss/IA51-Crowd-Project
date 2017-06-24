@@ -26,7 +26,7 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
-import fr.utbm.info.ia51.crowdproject.motion.MotionQuery
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
 import io.sarl.core.DefaultContextInteractions
 import io.sarl.lang.core.Address
 import java.util.Collection
@@ -40,6 +40,7 @@ import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -65,20 +66,22 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param motionBehavior the world's motion behavior
 	 * @param frustrumRadius the distance of perception of the hamster
 	 * @param frustrumAngle the radius of the frustrum of the hamster
-	 * @param isDeaf <code>true if the hamster can't have any audio perception</code>
 	 */
 	def createHamster(motionBehavior : MotionBehavior,
 		frustrumRadius : float,
-		frustrumAngle : float,
-		isDeaf : boolean
+		frustrumAngle : float
 	) : HamsterBody {
 		val body = new HamsterBody(
 			Geometry.createCircle(5.0f),
 			Geometry.createSlice(frustrumRadius, frustrumAngle),
-			isDeaf,
+			Geometry.createCircle(100.0f),
 			UUID::randomUUID,
 			motionBehavior
 		)
+		body.getFixture(0).userData = ShapeType.HAMSTER_BODY
+		body.getFixture(1).userData = ShapeType.FRUSTRUM
+		body.getFixture(2).userData = ShapeType.NO_CRY
+		
 		body.translate(Math.random * 600 - 300, Math.random * 400 - 200)
 		body.rotateAboutCenter(Math.random * Math.PI * 2)
 		this.world.addBody(body);
@@ -91,7 +94,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	 * @param actions the list of actions to apply
 	 * @param agentBodies the list of agent bodies
 	 */
-	def applyActions(actions : List<MotionQuery>, agentBodies : Map<UUID, AgentBody>) {
+	def applyActions(actions : List<ActionQuery>, agentBodies : Map<UUID, AgentBody>) {
 		for (action : actions) {
 			var agentBody = agentBodies.get(action.emitter)
 			
@@ -103,6 +106,12 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				agentBody.applyTorque(action.angular)
 			} else {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
+			}
+			
+			switch (agentBody.cry) {
+				case NONE: agentBody.getFixture(2).userData = ShapeType.NO_CRY
+				case POSITIVE: agentBody.getFixture(2).userData = ShapeType.POSITIVE_CRY
+				case WARNING: agentBody.getFixture(2).userData = ShapeType.WARNING_CRY
 			}
 		}
 	}
@@ -176,7 +185,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		this.lastNanoTime = thisNanoTime
 		world.update(timeDiff / 1.0e9)
 	}
-
+	
 	/**
 	 * Getter of the world
 	 * 
@@ -220,7 +229,7 @@ skill DefaultEnvironmentMotion implements EnvironmentMotion {
 	 * @param time the time at which the movement query is sent
 	 * @param motion data about the path to follow
 	 */
-	def move(agentId : UUID, environmentAddress : Address, time : long, motion : MotionQuery) {
+	def move(agentId : UUID, environmentAddress : Address, time : long, motion : ActionQuery) {
 		emit(new Action(agentId, time, motion))
 			[it == environmentAddress]
 	}
