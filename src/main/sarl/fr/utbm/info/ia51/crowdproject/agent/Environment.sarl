@@ -27,7 +27,10 @@ import fr.utbm.info.ia51.crowdproject.environment.AgentBody
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.LevelDesign
 import fr.utbm.info.ia51.crowdproject.environment.Levels
+import fr.utbm.info.ia51.crowdproject.environment.SoundBeaconBody
+import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
 import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.ui.FXMLViewerController
 import io.sarl.core.DefaultContextInteractions
@@ -59,6 +62,8 @@ agent Environment {
 	var motionBehavior : MotionBehavior
 	var time = 0 as long
 	val random = new Random
+
+	var soundUser : StaticSoundSource
 
 	on Initialize {
 
@@ -116,6 +121,19 @@ agent Environment {
 		info("End of the simulation. Killing the environment agent.")
 	}
 
+	on UserInteractionSoundSource {
+		synchronized (this) {
+			if(soundUser !== null) {
+				val soundSourcesToRemove = new ArrayList<EnvironmentBody>
+				soundSourcesToRemove += soundUser
+				world.removeBody(soundUser)
+				emit(new FrontEndEnvironmentClean(soundSourcesToRemove))
+			}
+			soundUser = new SoundBeaconBody(CryType.POSITIVE, new Vector2(occurrence.x, occurrence.y))
+			world.addBody(soundUser)
+		}
+	}
+
 	on RunBeginningOfStep {
 		synchronized (this) {
 
@@ -129,7 +147,7 @@ agent Environment {
 	on Action [occurrence.time >= this.time] {
 		synchronized (this) {
 			this.actions += occurrence.motion
-			
+
 			if (this.actions.size == this.agentBodies.size) {
 				val actionsToApply = new LinkedList(actions)
 				this.actions.clear
@@ -166,6 +184,7 @@ agent Environment {
 			val bodiesToVisuallyUpdate = new ArrayList<EnvironmentBody>()
 			bodiesToVisuallyUpdate += (agentBodies.values)
 			bodiesToVisuallyUpdate += this.levelDesign.soundSources
+			bodiesToVisuallyUpdate += this.soundUser
 			emit(new FrontEndEnvironmentChange(bodiesToVisuallyUpdate))
 			Thread.sleep(100/6)
 			

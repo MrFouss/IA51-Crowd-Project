@@ -120,3 +120,28 @@ event FrontEndEnvironmentClean {
 		this.objects = objects
 	}
 }
+
+/**
+ * Event called when user wants a sound beacon at given coordinates
+ */
+event UserInteractionViewSource {
+	var x : float
+	var y : float
+
+	new(x : float, y : float) {
+		this.x = x
+		this.y = y
+	}
+}
+/**
+ * Event called when user wants a view beacon at given coordinates
+ */
+event UserInteractionSoundSource {
+	var x : float
+	var y : float
+
+	new(x : float, y : float) {
+		this.x = x
+		this.y = y
+	}
+}
