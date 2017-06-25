@@ -55,7 +55,7 @@ agent Environment {
 
 	val agentBodies = new TreeMap<UUID, AgentBody>
 	var levelDesign : LevelDesign
-	
+
 	val actions = new LinkedList<ActionQuery>
 	var targetPosition : Vector2
 
@@ -127,7 +127,6 @@ agent Environment {
 				val soundSourcesToRemove = new ArrayList<EnvironmentBody>
 				soundSourcesToRemove += soundUser
 				world.removeBody(soundUser)
-				emit(new FrontEndEnvironmentClean(soundSourcesToRemove))
 			}
 			soundUser = new SoundBeaconBody(CryType.POSITIVE, new Vector2(occurrence.x, occurrence.y))
 			world.addBody(soundUser)
@@ -170,7 +169,7 @@ agent Environment {
 				// TODO do something to notify that all hamsters reached the target
 				killMe
 			}
-			
+
 			val soundSourcesToRemove = new ArrayList<EnvironmentBody>
 			this.levelDesign.soundSources.forEach[soundSource |
 				if (!soundSource.update) {
@@ -184,7 +183,7 @@ agent Environment {
 			val bodiesToVisuallyUpdate = new ArrayList<EnvironmentBody>()
 			bodiesToVisuallyUpdate += (agentBodies.values)
 			bodiesToVisuallyUpdate += this.levelDesign.soundSources
-			bodiesToVisuallyUpdate += this.soundUser
+
 			emit(new FrontEndEnvironmentChange(bodiesToVisuallyUpdate))
 			Thread.sleep(100/6)
 			

@@ -33,6 +33,8 @@ import fr.utbm.info.ia51.crowdproject.^agent.UserInteractionSoundSource
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import fr.utbm.info.ia51.crowdproject.environment.SoundBeaconBody
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.janusproject.Boot
 import io.sarl.lang.core.Address
@@ -43,6 +45,7 @@ import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.HashMap
+import java.util.LinkedList
 import java.util.Optional
 import java.util.ResourceBundle
 import java.util.UUID
@@ -75,6 +78,7 @@ import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.geometry.Circle
 import org.dyn4j.geometry.Slice
+import org.dyn4j.geometry.Vector2
 
 /** 
  * 
@@ -101,6 +105,7 @@ class FXMLViewerController implements Initializable, EventListener {
 
 	val id = UUID.randomUUID
 	val shapes = new HashMap<Fixture, Shape>
+	var userInteractionShapes = new LinkedList<Shape>
 
 	var openSpace : OpenEventSpace
 
@@ -163,7 +168,7 @@ class FXMLViewerController implements Initializable, EventListener {
 						shapes.remove(fixture)
 					}
 				}
-			}
+			 }
 			worldDisplay.children.all = new ArrayList(shapes.values)
 		}
 	}
@@ -407,9 +412,23 @@ class FXMLViewerController implements Initializable, EventListener {
             override handle(e : MouseEvent) {
 				if (e.button == MouseButton.PRIMARY) {
 					var u = new UserInteractionSoundSource((e.sceneX - WIDTH / 2) as float, (e.sceneY - HEIGHT / 2) as float)
-					worldDisplay.children.add(new javafx.scene.shape.Circle(e.sceneX, e.sceneY, 10))
 					u.setSource(new Address(openSpace.spaceID, FXMLViewerController.this.getID))
 					FXMLViewerController.this.openSpace.emit(u)
+					if(!userInteractionShapes.isEmpty) {
+						worldDisplay.children.removeAll(userInteractionShapes)
+						userInteractionShapes = new LinkedList
+					}
+
+					val beacon = new SoundBeaconBody(CryType.POSITIVE, new Vector2(e.sceneX, e.sceneY))
+					val circle1 = new javafx.scene.shape.Circle(e.sceneX,
+						e.sceneY, beacon.fixtures.get(0).shape.radius)
+					val circle2 = new javafx.scene.shape.Circle(e.sceneX,
+						e.sceneY, beacon.fixtures.get(1).shape.radius)
+
+					updateColor(circle1, beacon.fixtures.get(0).userData as ShapeType)
+					updateColor(circle2, beacon.fixtures.get(1).userData as ShapeType)
+					userInteractionShapes.addAll(circle1, circle2)
+					worldDisplay.children.addAll(userInteractionShapes)
 				}
 			}
 		})
