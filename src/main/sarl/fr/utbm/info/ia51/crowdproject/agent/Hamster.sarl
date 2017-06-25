@@ -23,24 +23,27 @@
  */
 package fr.utbm.info.ia51.crowdproject.^agent
 
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
+import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import fr.utbm.info.ia51.crowdproject.environment.StaticBody
+import fr.utbm.info.ia51.crowdproject.environment.TargetBody
+import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
+import fr.utbm.info.ia51.crowdproject.motion.CryType
+import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
+import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
+import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
 import io.sarl.core.Destroy
 import io.sarl.core.Logging
 import java.util.List
-import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.CryType
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
-import fr.utbm.info.ia51.crowdproject.environment.TargetBody
-import fr.utbm.info.ia51.crowdproject.environment.ShapeType
-import fr.utbm.info.ia51.crowdproject.environment.StaticBody
-import org.dyn4j.geometry.Vector2
 import org.dyn4j.geometry.Slice
+import org.dyn4j.geometry.Vector2
 
 /**
  * The hamster agent
@@ -57,7 +60,6 @@ agent Hamster extends Animat {
 	
 	override initializationMethod(params : List<Object>) : void {
 		info("New hamster spawned.")
-		setSkill(new DefaultEnvironmentMotion, typeof(EnvironmentMotion))
 		
 		super.initializationMethod(params)
 		

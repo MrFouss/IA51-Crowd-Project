@@ -27,10 +27,14 @@ import fr.utbm.info.ia51.crowdproject.Launcher
 import fr.utbm.info.ia51.crowdproject.^agent.EndOfSimulation
 import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
+import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentClean
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
+import fr.utbm.info.ia51.crowdproject.^agent.UserInteractionSoundSource
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import fr.utbm.info.ia51.crowdproject.environment.SoundBeaconBody
+import fr.utbm.info.ia51.crowdproject.motion.CryType
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import io.janusproject.Boot
 import io.sarl.lang.core.Address
@@ -41,10 +45,12 @@ import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.HashMap
+import java.util.LinkedList
 import java.util.Optional
 import java.util.ResourceBundle
 import java.util.UUID
 import javafx.application.Platform
+import javafx.^event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.geometry.Insets
@@ -56,6 +62,8 @@ import javafx.scene.control.Dialog
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.image.Image
+import javafx.scene.input.MouseButton
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
@@ -70,6 +78,7 @@ import org.dyn4j.dynamics.Body
 import org.dyn4j.dynamics.BodyFixture
 import org.dyn4j.geometry.Circle
 import org.dyn4j.geometry.Slice
+import org.dyn4j.geometry.Vector2
 
 /** 
  * 
@@ -96,6 +105,7 @@ class FXMLViewerController implements Initializable, EventListener {
 
 	val id = UUID.randomUUID
 	val shapes = new HashMap<Fixture, Shape>
+	var userInteractionShapes = new LinkedList<Shape>
 
 	var openSpace : OpenEventSpace
 
@@ -136,9 +146,8 @@ class FXMLViewerController implements Initializable, EventListener {
 							shapes.put(fixture, newShape)
 						} else {
 							val shape = shapes.get(fixture)
-
 							updateColor(shape, fixture.userData as ShapeType)
-							
+
 							// don't apply transforms if the object is not movable
 							if (object instanceof MobileBody)
 								shape.transform(object, fixture)
@@ -153,7 +162,13 @@ class FXMLViewerController implements Initializable, EventListener {
 						shapes.put(fixture, newShape)
 					}
 				}
-			}
+			} else if (^event instanceof FrontEndEnvironmentClean) {
+				for (object : ^event.objects) {
+					for (fixture : object.fixtures) {
+						shapes.remove(fixture)
+					}
+				}
+			 }
 			worldDisplay.children.all = new ArrayList(shapes.values)
 		}
 	}
@@ -320,7 +335,7 @@ class FXMLViewerController implements Initializable, EventListener {
 			s.transforms.add(new Rotate(Math.toDegrees(object.orientation), s.centerX, s.centerY))
 		}
 	}
-	
+
 	override initialize(arg0 : URL, arg1 : ResourceBundle) {
 		var dialog : Dialog<ArrayList<String>> = new Dialog
 		dialog.setTitle("Setup window");
@@ -378,10 +393,38 @@ class FXMLViewerController implements Initializable, EventListener {
 			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, MotionBehavior::KINEMATIC,
 				this, levelDesign)
 
-			//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+			// Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
+			initMouseEvents
 		]);
 	}
-	
+
+	private def initMouseEvents {
+		worldDisplay.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+            override handle(e : MouseEvent) {
+				if (e.button == MouseButton.PRIMARY) {
+					var u = new UserInteractionSoundSource((e.sceneX - WIDTH / 2) as float, (e.sceneY - HEIGHT / 2) as float)
+					u.setSource(new Address(openSpace.spaceID, FXMLViewerController.this.getID))
+					FXMLViewerController.this.openSpace.emit(u)
+					if(!userInteractionShapes.isEmpty) {
+						worldDisplay.children.removeAll(userInteractionShapes)
+						userInteractionShapes = new LinkedList
+					}
+
+					val beacon = new SoundBeaconBody(CryType.POSITIVE, new Vector2(e.sceneX, e.sceneY))
+					val circle1 = new javafx.scene.shape.Circle(e.sceneX,
+						e.sceneY, beacon.fixtures.get(0).shape.radius)
+					val circle2 = new javafx.scene.shape.Circle(e.sceneX,
+						e.sceneY, beacon.fixtures.get(1).shape.radius)
+
+					updateColor(circle1, beacon.fixtures.get(0).userData as ShapeType)
+					updateColor(circle2, beacon.fixtures.get(1).userData as ShapeType)
+					userInteractionShapes.addAll(circle1, circle2)
+					worldDisplay.children.addAll(userInteractionShapes)
+				}
+			}
+		})
+	}
 }
 
 class GeometryConversionException extends RuntimeException {
