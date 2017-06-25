@@ -95,8 +95,12 @@ agent Hamster extends Animat {
 					occurrence.agentId,
 					occurrence.agentBody.orientation,
 					occurrence.agentBody.position.to(target.position),
-					occurrence.agentBody.maxLinear,
-					occurrence.agentBody.maxAngular
+					occurrence.agentBody.linearVelocity,
+					occurrence.agentBody.angularVelocity,
+					occurrence.agentBody.maxLinearVelocity,
+					occurrence.agentBody.maxAngularVelocity,
+					occurrence.agentBody.maxLinearAcceleration,
+					occurrence.agentBody.maxAngularAcceleration
 				)
 				
 				computedMotion.cry = CryType.POSITIVE
@@ -109,9 +113,13 @@ agent Hamster extends Animat {
 					computedMotion = this.fleeBehavior.run(
 						occurrence.agentId,
 						occurrence.agentBody.orientation,
-						occurrence.agentBody.position.to(closeObstacle.position),
-						occurrence.agentBody.maxLinear,
-						occurrence.agentBody.maxAngular
+						occurrence.agentBody.position.to(closeObstacle.position), 
+						occurrence.agentBody.linearVelocity,
+						occurrence.agentBody.angularVelocity,
+						occurrence.agentBody.maxLinearVelocity, 
+						occurrence.agentBody.maxAngularVelocity,
+						occurrence.agentBody.maxLinearAcceleration, 
+						occurrence.agentBody.maxAngularAcceleration
 					)
 
 					computedMotion.cry = CryType.WARNING
@@ -123,16 +131,24 @@ agent Hamster extends Animat {
 						computedMotion = this.wanderBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
-							occurrence.agentBody.maxLinear,
-							occurrence.agentBody.maxAngular
+							occurrence.agentBody.linearVelocity,
+							occurrence.agentBody.angularVelocity,
+							occurrence.agentBody.maxLinearVelocity,
+							occurrence.agentBody.maxAngularVelocity,
+							occurrence.agentBody.maxLinearAcceleration,
+							occurrence.agentBody.maxAngularAcceleration
 						)
 					else
 						computedMotion = this.seekBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
 							forceSumVector,
-							occurrence.agentBody.maxLinear,
-							occurrence.agentBody.maxAngular
+							occurrence.agentBody.linearVelocity,
+							occurrence.agentBody.angularVelocity,
+							occurrence.agentBody.maxLinearVelocity,
+							occurrence.agentBody.maxAngularVelocity,
+							occurrence.agentBody.maxLinearAcceleration,
+							occurrence.agentBody.maxAngularAcceleration
 						)
 
 					if (timeSinceLastCry == 0) {

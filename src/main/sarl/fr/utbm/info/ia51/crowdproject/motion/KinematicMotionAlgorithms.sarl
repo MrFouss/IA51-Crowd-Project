@@ -31,14 +31,19 @@ import java.util.UUID
  */
 class KinematicWanderAlgorithm implements WanderAlgorithm {
 
-	override run(emitter : UUID,
+	override run(
+		emitter : UUID,
 		orientation : double,
-		maxLinear : float,
-		maxAngular : float
+		actualSpeed : Vector2,
+		actualRotation : double,
+		maxLinearVelocity : float,
+		maxAngularVelocity : float,
+		maxLinearAcceleration : float,
+		maxAngularAcceleration : float
 	) : ActionQuery {
 		
-		var velocity = Vector2.create(maxLinear * 0.75f, orientation)
-		var angle = ((Math.random - Math.random) * maxAngular) as float
+		var velocity = Vector2.create(maxLinearVelocity * 0.75f, orientation)
+		var angle = ((Math.random - Math.random) * maxAngularVelocity) as float
 		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, velocity, angle)
 	}
 }
@@ -52,13 +57,17 @@ class KinematicSeekAlgorithm implements SeekAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetRelativePosition : Vector2,
-		maxLinear : float,
-		maxAngular : float
+		actualSpeed : Vector2,
+		actualRotation : double,
+		maxLinearVelocity : float,
+		maxAngularVelocity : float,
+		maxLinearAcceleration : float,
+		maxAngularAcceleration : float
 	) : ActionQuery {
 		
 		val currentVelocityVector = Vector2.create(1.0f, orientation)
 		val angleBetweenVectors = currentVelocityVector.getAngleBetween(targetRelativePosition)
-		val linearSpeed = maxLinear * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
+		val linearSpeed = maxLinearVelocity * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
 		val linearVelocity = Vector2.create(linearSpeed, orientation)
 		
 		if (targetRelativePosition.magnitude <= SLOW_DOWN_DISTANCE)
@@ -66,9 +75,9 @@ class KinematicSeekAlgorithm implements SeekAlgorithm {
 
 		var angularVelocity : float		
 		if (Math.abs(angleBetweenVectors) <= SLOW_DOWN_ANGLE)
-			angularVelocity = (angleBetweenVectors * maxAngular / SLOW_DOWN_ANGLE) as float
+			angularVelocity = (angleBetweenVectors * maxAngularVelocity / SLOW_DOWN_ANGLE) as float
 		else
-			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
+			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngularVelocity) as float
 
 		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
@@ -82,22 +91,26 @@ class KinematicFleeAlgorithm implements FleeAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetRelativePosition : Vector2,
-		maxLinear : float,
-		maxAngular : float
+		actualSpeed : Vector2,
+		actualRotation : double,
+		maxLinearVelocity : float,
+		maxAngularVelocity : float,
+		maxLinearAcceleration : float,
+		maxAngularAcceleration : float
 	) : ActionQuery {
 		
 		val fleeingVector = targetRelativePosition.negative
 
 		val currentVelocityVector = Vector2.create(1.0f, orientation)
 		val angleBetweenVectors = currentVelocityVector.getAngleBetween(fleeingVector)
-		val linearSpeed = maxLinear * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
+		val linearSpeed = maxLinearVelocity * ((Math.PI - Math.abs(angleBetweenVectors)) / Math.PI)
 		val linearVelocity = Vector2.create(linearSpeed, orientation)
 
 		var angularVelocity : float
 		if (Math.abs(angleBetweenVectors) <= SLOW_DOWN_ANGLE)
-			angularVelocity = (angleBetweenVectors * maxAngular / SLOW_DOWN_ANGLE) as float
+			angularVelocity = (angleBetweenVectors * maxAngularVelocity / SLOW_DOWN_ANGLE) as float
 		else
-			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngular) as float
+			angularVelocity = (Math.signum(angleBetweenVectors) * maxAngularVelocity) as float
 
 		return new ActionQuery(emitter, MotionBehavior::KINEMATIC, linearVelocity, angularVelocity)
 	}
