@@ -207,9 +207,6 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 			if(agentBody.motionBehavior == MotionBehavior::KINEMATIC) {
 				agentBody.setLinearVelocity(action.linear)
 				agentBody.setAngularVelocity(action.angular)
-			} else if (agentBody.motionBehavior == MotionBehavior::STEERING) {
-				agentBody.applyForce(action.linear)
-				agentBody.applyTorque(action.angular)
 			} else {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
 			}

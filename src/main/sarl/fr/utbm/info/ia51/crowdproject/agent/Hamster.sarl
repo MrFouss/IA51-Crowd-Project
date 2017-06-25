@@ -26,17 +26,14 @@ package fr.utbm.info.ia51.crowdproject.^agent
 import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.motion.ActionQuery
-import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
 import io.sarl.core.Destroy
 import io.sarl.core.Logging
 import java.util.List
 import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.CryType
 import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.TargetBody
@@ -68,10 +65,6 @@ agent Hamster extends Animat {
 			this.wanderBehavior = new KinematicWanderAlgorithm
 			this.seekBehavior = new KinematicSeekAlgorithm
 			this.fleeBehavior = new KinematicFleeAlgorithm
-		} else if (this.motionBehavior == MotionBehavior::STEERING) {
-			this.wanderBehavior = new SteeringWanderAlgorithm
-			this.seekBehavior = new SteeringSeekAlgorithm
-			this.fleeBehavior = new SteeringFleeAlgorithm
 		}
 	}
 	
@@ -95,12 +88,8 @@ agent Hamster extends Animat {
 					occurrence.agentId,
 					occurrence.agentBody.orientation,
 					occurrence.agentBody.position.to(target.position),
-					occurrence.agentBody.linearVelocity,
-					occurrence.agentBody.angularVelocity,
-					occurrence.agentBody.maxLinearVelocity,
-					occurrence.agentBody.maxAngularVelocity,
-					occurrence.agentBody.maxLinearAcceleration,
-					occurrence.agentBody.maxAngularAcceleration
+					occurrence.agentBody.maxLinear,
+					occurrence.agentBody.maxAngular
 				)
 				
 				computedMotion.cry = CryType.POSITIVE
@@ -114,12 +103,8 @@ agent Hamster extends Animat {
 						occurrence.agentId,
 						occurrence.agentBody.orientation,
 						occurrence.agentBody.position.to(closeObstacle.position), 
-						occurrence.agentBody.linearVelocity,
-						occurrence.agentBody.angularVelocity,
-						occurrence.agentBody.maxLinearVelocity, 
-						occurrence.agentBody.maxAngularVelocity,
-						occurrence.agentBody.maxLinearAcceleration, 
-						occurrence.agentBody.maxAngularAcceleration
+						occurrence.agentBody.maxLinear, 
+						occurrence.agentBody.maxAngular
 					)
 
 					computedMotion.cry = CryType.WARNING
@@ -131,24 +116,16 @@ agent Hamster extends Animat {
 						computedMotion = this.wanderBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
-							occurrence.agentBody.linearVelocity,
-							occurrence.agentBody.angularVelocity,
-							occurrence.agentBody.maxLinearVelocity,
-							occurrence.agentBody.maxAngularVelocity,
-							occurrence.agentBody.maxLinearAcceleration,
-							occurrence.agentBody.maxAngularAcceleration
+							occurrence.agentBody.maxLinear,
+							occurrence.agentBody.maxAngular
 						)
 					else
 						computedMotion = this.seekBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
 							forceSumVector,
-							occurrence.agentBody.linearVelocity,
-							occurrence.agentBody.angularVelocity,
-							occurrence.agentBody.maxLinearVelocity,
-							occurrence.agentBody.maxAngularVelocity,
-							occurrence.agentBody.maxLinearAcceleration,
-							occurrence.agentBody.maxAngularAcceleration
+							occurrence.agentBody.maxLinear,
+							occurrence.agentBody.maxAngular
 						)
 
 					if (timeSinceLastCry == 0) {

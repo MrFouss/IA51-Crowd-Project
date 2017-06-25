@@ -33,12 +33,8 @@ interface WanderAlgorithm {
 
 	def run(emitter : UUID,
 		orientation : double,
-		actualLinearVelocity : Vector2,
-		actualangularVelocity : double,
-		maxLinearVelocity : float,
-		maxAngularVelocity : float,
-		maxLinearAcceleration : float,
-		maxAngularAcceleration : float
+		maxLinear : float,
+		maxAngular : float
 	) : ActionQuery
 }
 
@@ -54,12 +50,8 @@ interface SeekAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetPosition : Vector2,
-		actualLinearVelocity : Vector2,
-		actualangularVelocity : double,
-		maxLinearVelocity : float,
-		maxAngularVelocity : float,
-		maxLinearAcceleration : float,
-		maxAngularAcceleration : float
+		maxLinear : float,
+		maxAngular : float
 	) : ActionQuery
 }
 
@@ -74,11 +66,7 @@ interface FleeAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetPosition : Vector2,
-		actualLinearVelocity : Vector2,
-		actualangularVelocity : double,
-		maxLinearVelocity : float,
-		maxAngularVelocity : float,
-		maxLinearAcceleration : float,
-		maxAngularAcceleration : float
+		maxLinear : float,
+		maxAngular : float
 	) : ActionQuery
 }
