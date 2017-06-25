@@ -27,6 +27,5 @@ package fr.utbm.info.ia51.crowdproject.motion
  * The type of dynamic used for the motion of objects in the environment
  */
 enum MotionBehavior {
-	KINEMATIC,
-	STEERING
+	KINEMATIC
 }

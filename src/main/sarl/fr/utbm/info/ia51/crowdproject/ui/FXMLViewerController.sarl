@@ -349,9 +349,6 @@ class FXMLViewerController implements Initializable, EventListener {
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20, 150, 10, 10));
 
-		var motionBox = new ComboBox
-		motionBox.items.addAll("Kinematic", "Steering")
-		motionBox.value = "Kinematic"
 
 		var nbHamsterField = new TextField
 		nbHamsterField.setPromptText("" + NB_HAMSTERS);
@@ -363,14 +360,13 @@ class FXMLViewerController implements Initializable, EventListener {
 		var debugBox = new CheckBox
 		debugBox.selected = false
 
-		grid.add(new Label("Type of motion:"), 0, 0)
-		grid.add(motionBox, 1, 0)
-		grid.add(new Label("Number of hamsters:"), 0, 1)
-		grid.add(nbHamsterField, 1, 1)
-		grid.add(new Label("Level design"), 0, 2)
-		grid.add(levelBox, 1, 2)
-		grid.add(new Label("Mode Debug:"), 0, 3)
-		grid.add(debugBox, 1, 3)
+
+		grid.add(new Label("Number of hamsters:"), 0, 0)
+		grid.add(nbHamsterField, 1, 0)
+		grid.add(new Label("Level design"), 0, 1)
+		grid.add(levelBox, 1, 1)
+		grid.add(new Label("Mode Debug:"), 0, 2)
+		grid.add(debugBox, 1, 2)
 		
 
 		dialog.getDialogPane().setContent(grid)
@@ -379,7 +375,7 @@ class FXMLViewerController implements Initializable, EventListener {
 
 		dialog.setResultConverter([dialogButton | 
 			if (dialogButton == launchButtonType) {
-				return new ArrayList<String>(Arrays.asList(motionBox.getValue, nbHamsterField.getText));
+				return new ArrayList<String>(Arrays.asList(nbHamsterField.getText));
 		} else {
 			cancel = true
 			Platform.exit
@@ -389,16 +385,12 @@ class FXMLViewerController implements Initializable, EventListener {
 		var result : Optional<ArrayList<String>> = dialog.showAndWait();
 
 		result.ifPresent([ config |
-			if(config.get(0) == "Kinematic")
-				motionBehavior = MotionBehavior::KINEMATIC
-			else
-				motionBehavior = MotionBehavior::STEERING
 
-			nbHamster = if(config.get(1) != "") Integer.valueOf(config.get(1)) else NB_HAMSTERS
+			nbHamster = if(config.get(0) != "") Integer.valueOf(config.get(0)) else NB_HAMSTERS
 			levelDesign = levelBox.getValue
 			visualDebug = debugBox.isSelected
 
-			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, motionBehavior,
+			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, MotionBehavior::KINEMATIC,
 				this, levelDesign)
 
 			// Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
