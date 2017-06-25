@@ -43,6 +43,7 @@ import fr.utbm.info.ia51.crowdproject.environment.TargetBody
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
 import fr.utbm.info.ia51.crowdproject.environment.StaticBody
 import org.dyn4j.geometry.Vector2
+import org.dyn4j.geometry.Slice
 
 /**
  * The hamster agent
@@ -51,6 +52,9 @@ agent Hamster extends Animat {
 	var wanderBehavior : WanderAlgorithm
 	var seekBehavior : SeekAlgorithm
 	var fleeBehavior : FleeAlgorithm
+	
+	var timeSinceLastCry = 0
+	var lastCry = CryType.NONE
 
 	uses Logging, EnvironmentMotion
 	
@@ -78,43 +82,51 @@ agent Hamster extends Animat {
 	on Perception [it.agentId == this.agentId] {
 		synchronized(this) {
 			var computedMotion : ActionQuery
+
+			if (timeSinceLastCry > 100 || occurrence.agentBody.cry == CryType.NONE)
+				timeSinceLastCry = 0
+			else
+				timeSinceLastCry++
 			
-			if (occurrence.objects.isEmpty || isPerceptionsOnlyWalls(occurrence.objects)) {
-				computedMotion = this.wanderBehavior.run(
+			// If the target has been perceived
+			var target = getPerceivedTarget(occurrence.objects)
+			if (target !== null) {
+				computedMotion = this.seekBehavior.run(
 					occurrence.agentId,
 					occurrence.agentBody.orientation,
+					occurrence.agentBody.position.to(target.position),
 					occurrence.agentBody.maxLinear,
 					occurrence.agentBody.maxAngular
 				)
-				computedMotion.cry = CryType.NONE
+				
+				computedMotion.cry = CryType.POSITIVE
+				lastCry = CryType.POSITIVE
 				
 			} else {
-				// If the target has been perceived
-				var target = getPerceivedTarget(occurrence.objects)
-				if (target !== null) {
-					computedMotion = this.seekBehavior.run(
+				var closeObstacle = getPerceivedCloseObstacle(occurrence.objects)
+				if (closeObstacle !== null &&
+						(occurrence.agentBody.getFixture(1).shape as Slice).sliceRadius > occurrence.agentBody.getFixture(0).shape.radius) {
+					computedMotion = this.fleeBehavior.run(
 						occurrence.agentId,
 						occurrence.agentBody.orientation,
-						occurrence.agentBody.position.to(target.position),
+						occurrence.agentBody.position.to(closeObstacle.position),
 						occurrence.agentBody.maxLinear,
 						occurrence.agentBody.maxAngular
 					)
-					computedMotion.cry = CryType.POSITIVE
+
+					computedMotion.cry = CryType.WARNING
+					lastCry = CryType.WARNING
 					
 				} else {
-					var closeObstacle = getPerceivedCloseObstacle(occurrence.objects)
-					if (closeObstacle !== null) {
-						computedMotion = this.fleeBehavior.run(
+					var forceSumVector = getSumOfForces(occurrence.agentBody.position, occurrence.objects)
+					if (forceSumVector.isZero)
+						computedMotion = this.wanderBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
-							occurrence.agentBody.position.to(closeObstacle.position),
 							occurrence.agentBody.maxLinear,
 							occurrence.agentBody.maxAngular
 						)
-						computedMotion.cry = CryType.WARNING
-						
-					} else {
-						var forceSumVector = getSumOfForces(occurrence.agentBody.position, occurrence.objects)
+					else
 						computedMotion = this.seekBehavior.run(
 							occurrence.agentId,
 							occurrence.agentBody.orientation,
@@ -122,23 +134,18 @@ agent Hamster extends Animat {
 							occurrence.agentBody.maxLinear,
 							occurrence.agentBody.maxAngular
 						)
+
+					if (timeSinceLastCry == 0) {
 						computedMotion.cry = CryType.NONE
+						lastCry = CryType.NONE
+					} else {
+						computedMotion.cry = occurrence.agentBody.cry
 					}
 				}
 			}
 			
 			move(occurrence.agentId, occurrence.source, occurrence.time, computedMotion)
 		}
-	}
-	
-	private def isPerceptionsOnlyWalls(objects : List<EnvironmentBody>) {
-		for (object : objects) {
-			for (fixture : object.fixtures) {
-				if (fixture.userData != ShapeType.WALL)
-					return false
-			}
-		}
-		return true
 	}
 	
 	private def getPerceivedTarget(objects : List<EnvironmentBody>) : TargetBody {
@@ -165,9 +172,11 @@ agent Hamster extends Animat {
 			for (fixture : object.fixtures) {
 				switch (fixture.userData as ShapeType) {
 					case HAMSTER_BODY: {
-						var directionVector = currentPosition.to(object.position)
-						directionVector.normalize
-						forceSumVector.add(directionVector.multiply(0.5f))
+						if((object.getFixture(1).shape as Slice).sliceRadius <= object.getFixture(0).shape.radius) {
+							var directionVector = currentPosition.to(object.position)
+							directionVector.normalize
+							forceSumVector.add(directionVector.multiply(0.5f))
+						}
 					}
 					case TARGET_SOUND: {
 						var directionVector = currentPosition.to(object.position)
@@ -182,7 +191,7 @@ agent Hamster extends Animat {
 					case WARNING_CRY: {
 						var directionVector = object.position.to(currentPosition)
 						directionVector.normalize
-						forceSumVector.add(directionVector)
+						forceSumVector.add(directionVector.multiply(2.0f))
 					}
 					default: {}
 				}
