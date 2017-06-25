@@ -213,6 +213,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 			} else {
 				throw new EnumConstantNotPresentException(MotionBehavior, "")
 			}
+			agentBody.cry = action.cryType
 			
 			switch (agentBody.cry) {
 				case NONE: agentBody.getFixture(2).userData = ShapeType.NO_CRY

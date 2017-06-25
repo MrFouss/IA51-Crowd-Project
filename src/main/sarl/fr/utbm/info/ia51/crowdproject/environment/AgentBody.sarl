@@ -35,7 +35,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	val agentId : UUID
 
 	val motionBehavior : MotionBehavior
-	val cry : CryType
+	var cry : CryType
 	
 	new (shape : Convex,
 		frustrum : Convex,
@@ -96,6 +96,10 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	
 	def getCry : CryType {
 		return this.cry
+	}
+
+	def setCry(cry : CryType) {
+		this.cry = cry
 	}
 	
 	/**
