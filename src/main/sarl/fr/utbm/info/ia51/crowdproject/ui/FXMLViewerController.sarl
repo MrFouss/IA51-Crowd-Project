@@ -343,7 +343,7 @@ class FXMLViewerController implements Initializable, EventListener {
 
 		var levelBox = new ComboBox<Levels>
 		levelBox.items.addAll(Levels.values)
-		levelBox.value = Levels.valueOf("BASIC")
+		levelBox.value = Levels.valueOf("RUSSIANBOXES")
 
 		var debugBox = new CheckBox
 		debugBox.selected = true
