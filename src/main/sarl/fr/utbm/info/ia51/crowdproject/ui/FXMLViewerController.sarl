@@ -28,7 +28,6 @@ import fr.utbm.info.ia51.crowdproject.^agent.EndOfSimulation
 import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
-import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
@@ -41,8 +40,6 @@ import io.sarl.util.OpenEventSpace
 import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
-import java.util.Collections
-import java.util.Comparator
 import java.util.HashMap
 import java.util.Optional
 import java.util.ResourceBundle
@@ -249,12 +246,14 @@ class FXMLViewerController implements Initializable, EventListener {
 				shape.toFront
 			}
 			case TARGET_SOUND: {
-				shape.fill = new RadialGradient(
-					0, 0, 0.5, 0.5, 0.5,
-					true,
-					CycleMethod.NO_CYCLE,
-					new Stop(1, Color.TRANSPARENT),
-					new Stop(0, Color.GOLD))
+//				shape.fill = new RadialGradient(
+//					0, 0, 0.5, 0.5, 0.5,
+//					true,
+//					CycleMethod.NO_CYCLE,
+//					new Stop(1, Color.TRANSPARENT),
+//					new Stop(0, Color.GOLD))
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.GOLD
 				shape.toBack
 			}
 			case NO_CRY: {
@@ -263,21 +262,25 @@ class FXMLViewerController implements Initializable, EventListener {
 				shape.toBack
 			}
 			case POSITIVE_CRY: {
-				shape.fill = new RadialGradient(
-					0, 0, 0.5, 0.5, 0.5,
-					true,
-					CycleMethod.NO_CYCLE,
-					new Stop(1, Color.TRANSPARENT),
-					new Stop(0, Color.GREEN))
+//				shape.fill = new RadialGradient(
+//					0, 0, 0.5, 0.5, 0.5,
+//					true,
+//					CycleMethod.NO_CYCLE,
+//					new Stop(1, Color.TRANSPARENT),
+				// new Stop(0, Color.GREEN))
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.GREEN
 				shape.toBack
 			}
 			case WARNING_CRY: {
-				shape.fill = new RadialGradient(
-					0, 0, 0.5, 0.5, 0.5,
-					true,
-					CycleMethod.NO_CYCLE,
-					new Stop(1, Color.TRANSPARENT),
-					new Stop(0, Color.RED))
+//				shape.fill = new RadialGradient(
+//					0, 0, 0.5, 0.5, 0.5,
+//					true,
+//					CycleMethod.NO_CYCLE,
+//					new Stop(1, Color.TRANSPARENT),
+				// new Stop(0, Color.RED))
+				shape.fill = Color.TRANSPARENT
+				shape.stroke = Color.RED
 				shape.toBack
 			}
 		}
