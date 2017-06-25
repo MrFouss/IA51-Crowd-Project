@@ -37,6 +37,7 @@ class Launcher extends Application {
 	private var loader : FXMLLoader
 	
 	private var controller : FXMLViewerController
+	private var stage : Stage
 
 	public static def main(args : String[]) {
 		launch(args);
@@ -44,7 +45,7 @@ class Launcher extends Application {
 
 	@Override
 	public def start(stage : Stage) throws Exception {
-		
+		this.stage = stage
 		//FXML to improve with options
 		var location : URL = getClass().getResource("view/FXApplication.fxml")
 		loader = new FXMLLoader()
@@ -59,11 +60,13 @@ class Launcher extends Application {
 		stage.setScene(scene)
 		stage.show()
 		controller = loader.controller
+		controller.launcher = this
 	}
 
 	@Override
 	public def stop() throws Exception {
 		super.stop();
-		controller.fireGameOver
+		if(!controller.cancel)
+			controller.fireGameOver
 	}
 }
