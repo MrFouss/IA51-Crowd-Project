@@ -28,5 +28,8 @@ package fr.utbm.info.ia51.crowdproject.environment
  */
 enum Levels {
 	BASIC,
-	PARALLELISM
+	PARALLELISM,
+	SNAKE,
+	WHIRL,
+	RUSSIANBOXES
 }
