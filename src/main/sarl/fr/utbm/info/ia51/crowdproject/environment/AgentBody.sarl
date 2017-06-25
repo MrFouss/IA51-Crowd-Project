@@ -27,7 +27,6 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
-import javax.sound.sampled.BooleanControl.Type
 import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
