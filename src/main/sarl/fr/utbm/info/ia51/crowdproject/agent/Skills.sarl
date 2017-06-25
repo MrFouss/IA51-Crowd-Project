@@ -45,6 +45,8 @@ import org.dyn4j.dynamics.Step
 import org.dyn4j.dynamics.contact.ContactAdapter
 import org.dyn4j.dynamics.contact.ContactPoint
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+import org.dyn4j.geometry.Slice
+
 //import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
 //import org.dyn4j.collision.narrowphase.Gjk
 //import org.dyn4j.geometry.Ray
@@ -76,6 +78,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 			//  At the beginning of a step, we clear the list of view bodies
 			override begin(step : Step, world : World) {
 				viewedBodies.clear	
+				heardBodies.clear
 			}
 		})
 		this.world.addListener(new ContactAdapter() {
@@ -118,14 +121,16 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 							bodyList.add(seen)
 						}
 						
-					} else if (point.fixture1.userData == ShapeType.TARGET_SOUND ||
+					} else if (((point.fixture1.userData == ShapeType.TARGET_SOUND ||
 							point.fixture1.userData == ShapeType.POSITIVE_CRY ||
-							point.fixture1.userData == ShapeType.WARNING_CRY ||
-							point.fixture2.userData == ShapeType.TARGET_SOUND ||
+							point.fixture1.userData == ShapeType.WARNING_CRY) && 
+							AgentBody.isInstance(point.body2)) ||
+							((point.fixture2.userData == ShapeType.TARGET_SOUND ||
 							point.fixture2.userData == ShapeType.POSITIVE_CRY ||
-							point.fixture2.userData == ShapeType.WARNING_CRY) {
+							point.fixture2.userData == ShapeType.WARNING_CRY) &&
+							AgentBody.isInstance(point.body1))) {
 							
-						var hearing : EnvironmentBody
+						var hearing : AgentBody
 						var heard : EnvironmentBody
 
 						// Checking which fixture is a frustrum
@@ -136,7 +141,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 							if (point.fixture2.sensor) {
 								return
 							}
-							hearing = point.body2 as EnvironmentBody
+							hearing = point.body2 as AgentBody
 							heard = point.body1 as EnvironmentBody
 						} else if (point.fixture2.userData == ShapeType.TARGET_SOUND ||
 								point.fixture1.userData == ShapeType.POSITIVE_CRY ||
@@ -144,20 +149,23 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 							if (point.fixture1.sensor) {
 								return
 							}
-							hearing = point.body1 as EnvironmentBody
+							hearing = point.body1 as AgentBody
 							heard = point.body2 as EnvironmentBody
 						} else {
 							return
 						}
-
-						// checking if the body already perceived an other body and adding the new one
+						if ((hearing.fixtures.get(1).shape as Slice).sliceRadius <= 
+							hearing.fixtures.get(0).shape.radius
+						) {
+							// checking if the body already perceived an other body and adding the new one
 						var bodyList = heardBodies.get(hearing)
-						if (bodyList === null) {
-							bodyList = new LinkedList<EnvironmentBody>()
-							heardBodies.put(hearing, bodyList)
-						}
-						if (bodyList.contains(heard)) {
-							bodyList.add(heard)
+							if (bodyList === null) {
+								bodyList = new LinkedList<EnvironmentBody>()
+								heardBodies.put(hearing, bodyList)
+							}
+							if (!bodyList.contains(heard)) {
+								bodyList.add(heard)
+							}	
 						}
 					}
 				}
@@ -299,7 +307,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def getAuditoryPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
 		val perceivedObjects = new LinkedList<EnvironmentBody>
 
-		var heards = viewedBodies.get(agentBody)
+		var heards = heardBodies.get(agentBody)
 		if (heards !== null) {
 			var heards2 = heards.sortBy[it.position.distance(agentBody.position)]
 			perceivedObjects.addAll(heards2)
