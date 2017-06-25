@@ -60,7 +60,6 @@ agent Hamster extends Animat {
 	
 	override initializationMethod(params : List<Object>) : void {
 		info("New hamster spawned.")
-		setSkill(new DefaultEnvironmentMotion, typeof(EnvironmentMotion))
 		
 		super.initializationMethod(params)
 		

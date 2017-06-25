@@ -36,7 +36,7 @@ import io.sarl.core.Logging
  */
 abstract agent Animat {
 	
-	uses Lifecycle, Logging
+	uses Lifecycle, Logging, EnvironmentMotion
 	
 	var agentId : UUID
 	var motionBehavior : MotionBehavior
@@ -46,6 +46,7 @@ abstract agent Animat {
 	}
 
 	abstract def initializationMethod(params : List<Object>) : void {
+		setSkill(new DefaultEnvironmentMotion, typeof(EnvironmentMotion))
 		this.agentId = params.get(0) as UUID
 		this.motionBehavior = params.get(1) as MotionBehavior
 	}
