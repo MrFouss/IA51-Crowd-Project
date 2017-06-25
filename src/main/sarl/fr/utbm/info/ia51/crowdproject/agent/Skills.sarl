@@ -47,13 +47,6 @@ import org.dyn4j.dynamics.contact.ContactPoint
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
 import org.dyn4j.geometry.Slice
 
-//import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
-//import org.dyn4j.collision.narrowphase.Gjk
-//import org.dyn4j.geometry.Ray
-//import org.dyn4j.geometry.Transform
-//import org.dyn4j.collision.narrowphase.Raycast
-//import java.util.LinkedHashSet
-
 /** 
  * Default implementation of the EnvironmentManager capacity
  */
