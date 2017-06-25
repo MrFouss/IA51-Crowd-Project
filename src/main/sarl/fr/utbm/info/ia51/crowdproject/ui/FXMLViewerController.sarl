@@ -59,10 +59,7 @@ import javafx.scene.image.Image
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
-import javafx.scene.paint.CycleMethod
 import javafx.scene.paint.ImagePattern
-import javafx.scene.paint.RadialGradient
-import javafx.scene.paint.Stop
 import javafx.scene.shape.Arc
 import javafx.scene.shape.ArcType
 import javafx.scene.shape.Rectangle
@@ -346,10 +343,10 @@ class FXMLViewerController implements Initializable, EventListener {
 
 		var levelBox = new ComboBox<Levels>
 		levelBox.items.addAll(Levels.values)
-		levelBox.value = Levels.valueOf("RUSSIANBOXES")
+		levelBox.value = Levels.valueOf("BASIC")
 
 		var debugBox = new CheckBox
-		debugBox.selected = true
+		debugBox.selected = false
 
 		grid.add(new Label("Type of motion:"), 0, 0)
 		grid.add(motionBox, 1, 0)
