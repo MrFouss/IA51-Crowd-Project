@@ -23,10 +23,12 @@
  */
 package fr.utbm.info.ia51.crowdproject.ui
 
+import fr.utbm.info.ia51.crowdproject.Launcher
 import fr.utbm.info.ia51.crowdproject.^agent.EndOfSimulation
 import fr.utbm.info.ia51.crowdproject.^agent.Environment
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentChange
 import fr.utbm.info.ia51.crowdproject.^agent.FrontEndEnvironmentInitialization
+import fr.utbm.info.ia51.crowdproject.environment.EnvironmentBody
 import fr.utbm.info.ia51.crowdproject.environment.Levels
 import fr.utbm.info.ia51.crowdproject.environment.MobileBody
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
@@ -39,10 +41,13 @@ import io.sarl.util.OpenEventSpace
 import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
+import java.util.Collections
+import java.util.Comparator
 import java.util.HashMap
 import java.util.Optional
 import java.util.ResourceBundle
 import java.util.UUID
+import javafx.application.Platform
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.geometry.Insets
@@ -88,6 +93,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	public static var nbHamster : Integer
 	public static var levelDesign : Levels
 	public static var visualDebug = true
+	var cancel = false
 
 	@FXML
 	var worldDisplay : BorderPane
@@ -99,8 +105,18 @@ class FXMLViewerController implements Initializable, EventListener {
 
 	var openSpace : OpenEventSpace
 
+	var launcher : Launcher
+
 	def setOpenSpace(s : OpenEventSpace) {
 		this.openSpace = s
+	}
+
+	def setLauncher(l : Launcher) {
+		this.launcher = l
+	}
+
+	def getCancel  {
+		return cancel
 	}
 
 	def fireGameOver {
@@ -158,8 +174,7 @@ class FXMLViewerController implements Initializable, EventListener {
 	private def createShape(object : Body, fixture : BodyFixture) : Shape {
 		
 		if (fixture.shape instanceof Circle &&
-			fixture.userData as ShapeType == ShapeType.HAMSTER_BODY
-		) {
+			fixture.userData as ShapeType == ShapeType.HAMSTER_BODY) {
 			val g = fixture.shape as Circle
 			val rectangle = new Rectangle(
 				object.worldCenter.x - g.radius + WIDTH / 2,
@@ -216,14 +231,17 @@ class FXMLViewerController implements Initializable, EventListener {
 		switch (shapeType) {
 			case HAMSTER_BODY: {
 				shape.fill = new ImagePattern(hamsterIm)
+				shape.toFront
 			}
 			case WALL: {
 				shape.fill = Color.BLACK
 				shape.stroke = Color.GRAY
+				shape.toFront
 			}
 			case FRUSTRUM: {
 				shape.fill = Color.TRANSPARENT
 				shape.stroke = if(visualDebug) Color.BLUE else Color.TRANSPARENT
+				shape.toFront
 			}
 			case BEACON_BODY: {
 				shape.fill = Color.DARKCYAN
@@ -242,6 +260,7 @@ class FXMLViewerController implements Initializable, EventListener {
 			case NO_CRY: {
 				shape.fill = Color.TRANSPARENT
 				shape.stroke = if(visualDebug) Color.GRAY else Color.TRANSPARENT
+				shape.toBack
 			}
 			case POSITIVE_CRY: {
 				shape.fill = new RadialGradient(
@@ -339,30 +358,34 @@ class FXMLViewerController implements Initializable, EventListener {
 		grid.add(debugBox, 1, 3)
 		
 
-		dialog.getDialogPane().setContent(grid);
+		dialog.getDialogPane().setContent(grid)
 		
 		// Convert the result to an arraylist when the launch button is clicked.
-		
+
 		dialog.setResultConverter([dialogButton | 
 			if (dialogButton == launchButtonType) {
 				return new ArrayList<String>(Arrays.asList(motionBox.getValue, nbHamsterField.getText));
-		}
-		    return null;
-		]);
-		
+		} else {
+			cancel = true
+			Platform.exit
+			return null
+		}]);
+
 		var result : Optional<ArrayList<String>> = dialog.showAndWait();
+
 		result.ifPresent([ config |
 			if(config.get(0) == "Kinematic")
 				motionBehavior = MotionBehavior::KINEMATIC
 			else
 				motionBehavior = MotionBehavior::STEERING
-				
+
 			nbHamster = if(config.get(1) != "") Integer.valueOf(config.get(1)) else NB_HAMSTERS
 			levelDesign = levelBox.getValue
 			visualDebug = debugBox.isSelected
 
 			Boot::startJanus(typeof(Environment), WIDTH, HEIGHT, nbHamster, FRUSTRUM_RADIUS, FRUSTRUM_ANGLE, motionBehavior,
 				this, levelDesign)
+
 			//Boot.verboseLevel = LoggerCreator.toInt(Level.OFF)
 		]);
 	}

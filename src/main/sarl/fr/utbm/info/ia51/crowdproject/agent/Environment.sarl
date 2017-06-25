@@ -104,9 +104,9 @@ agent Environment {
 		info("Number of bodies in the world: " + world.bodyCount)
 		
 		val totalListOfBodies = new ArrayList<EnvironmentBody>
+		totalListOfBodies += levelDesign.soundSources
 		totalListOfBodies += agentBodies.values
 		totalListOfBodies += levelDesign.staticBodies
-		totalListOfBodies += levelDesign.soundSources
 		emit(new FrontEndEnvironmentInitialization(totalListOfBodies))
 		
 		emit(new RunBeginningOfStep) [it.isMe]
