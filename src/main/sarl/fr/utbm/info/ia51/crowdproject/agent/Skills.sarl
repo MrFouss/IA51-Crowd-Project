@@ -45,7 +45,13 @@ import org.dyn4j.dynamics.Step
 import org.dyn4j.dynamics.contact.ContactAdapter
 import org.dyn4j.dynamics.contact.ContactPoint
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
-import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
+//import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
+//import org.dyn4j.collision.narrowphase.Gjk
+//import org.dyn4j.geometry.Ray
+//import org.dyn4j.geometry.Transform
+//import org.dyn4j.collision.narrowphase.Raycast
+//import java.util.LinkedHashSet
+import java.util.HashSet
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -80,32 +86,33 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 				// We consider only bodies defined as EnvironmentBody
 				if (EnvironmentBody.isInstance(point.body1) &&
 					 EnvironmentBody.isInstance(point.body2)) {
-					if (StaticSoundSource.isInstance(point.body1) ||
-						 StaticSoundSource.isInstance(point.body2)
-					) {
-						
-					} else {
-						// Checking which fixture is a frustrum
+
+					// Checking which fixture is a frustrum
+					if (point.fixture1.userData == ShapeType.FRUSTRUM) {
+					// We don't want frustrums to see other frustrums
+						if (point.fixture2.sensor) {
+							return
+						}
+						seer = point.body1 as EnvironmentBody
+						seen = point.body2 as EnvironmentBody
+					} else if (point.fixture2.userData == ShapeType.FRUSTRUM) {
 						if (point.fixture1.sensor) {
-						// We don't want frustrums to see other frustrums
-							if (point.fixture2.sensor) {
-								return
-							}
-							seer = point.body1 as EnvironmentBody
-							seen = point.body2 as EnvironmentBody
-						} else {
-							seer = point.body2 as EnvironmentBody
-							seen = point.body1 as EnvironmentBody
+							return
 						}
-					
-					// checking if the body already perceived an other body and adding the new one
-						var bodyList = viewedBodies.get(seer)
-						if (bodyList === null) {
-							bodyList = new LinkedList<EnvironmentBody>()
-							viewedBodies.put(seer, bodyList)
-						}
-						bodyList.add(seen)
-					}		
+						seer = point.body2 as EnvironmentBody
+						seen = point.body1 as EnvironmentBody
+					} else {
+						return
+					}
+				
+				// checking if the body already perceived an other body and adding the new one
+					var bodyList = viewedBodies.get(seer)
+					if (bodyList === null) {
+						bodyList = new LinkedList<EnvironmentBody>()
+						viewedBodies.put(seer, bodyList)
+					}
+					bodyList.add(seen)
+						
 				}
 			}
 		})
@@ -208,10 +215,29 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def getVisualPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
 		val perceivedObjects = new LinkedList<EnvironmentBody>
 
-		val seens = viewedBodies.get(agentBody)
+		var seens = viewedBodies.get(agentBody)
 		if (seens !== null) {
-			seens.sortBy[it.position.distance(agentBody.position)]
-			perceivedObjects.addAll(seens)				
+			var seens2 = new HashSet(seens).sortBy[it.position.distance(agentBody.position)]
+//			val gjk = new Gjk()
+//			var toRemove = new LinkedList<EnvironmentBody>
+//			for (testedBody : seens2) {
+//				val ray = new Ray(agentBody.position, agentBody.position.difference(testedBody.position).normalize)
+//				for (otherBody : seens2) {
+//					if (testedBody != otherBody) {
+//						if(gjk.raycast(
+//								ray, 
+//								agentBody.position.distance(testedBody.position),
+//								otherBody.fixtures.findFirst[!it.sensor].shape,
+//								otherBody.transform,
+//								new Raycast())) {
+//							toRemove.add(testedBody)
+//							break
+//						}
+//					}
+//				}
+//			}
+//			seens2.removeAll(toRemove)
+			perceivedObjects.addAll(seens2)				
 		}
 		
 		return perceivedObjects
