@@ -35,9 +35,6 @@ import fr.utbm.info.ia51.crowdproject.motion.KinematicSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
 import fr.utbm.info.ia51.crowdproject.motion.SeekAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
-import fr.utbm.info.ia51.crowdproject.motion.SteeringWanderAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.WanderAlgorithm
 import io.sarl.core.Destroy
 import io.sarl.core.Logging
