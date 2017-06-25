@@ -27,11 +27,13 @@ import java.util.UUID
 import org.dyn4j.geometry.Convex
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import javax.sound.sampled.BooleanControl.Type
 import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 	
 	val agentId : UUID
+
 	val motionBehavior : MotionBehavior
 	val cry : CryType
 	
@@ -123,6 +125,7 @@ abstract class AgentBody extends MobileBody implements Comparable<AgentBody> {
 				throw new EnumConstantNotPresentException(MotionBehavior, "Motion behavior not yet supported")
 		}
 	}
+	
 	
 	abstract def getMaxLinearVelocity : float
 

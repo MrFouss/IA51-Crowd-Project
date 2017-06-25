@@ -40,7 +40,18 @@ import org.dyn4j.dynamics.World
 import org.dyn4j.geometry.Geometry
 import org.dyn4j.geometry.Vector2
 import fr.utbm.info.ia51.crowdproject.motion.MotionBehavior
+import org.dyn4j.dynamics.StepAdapter
+import org.dyn4j.dynamics.Step
+import org.dyn4j.dynamics.contact.ContactAdapter
+import org.dyn4j.dynamics.contact.ContactPoint
 import fr.utbm.info.ia51.crowdproject.environment.ShapeType
+//import fr.utbm.info.ia51.crowdproject.environment.StaticSoundSource
+//import org.dyn4j.collision.narrowphase.Gjk
+//import org.dyn4j.geometry.Ray
+//import org.dyn4j.geometry.Transform
+//import org.dyn4j.collision.narrowphase.Raycast
+//import java.util.LinkedHashSet
+import java.util.HashSet
 
 /** 
  * Default implementation of the EnvironmentManager capacity
@@ -51,6 +62,7 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 
 	var world : World
 	var lastNanoTime : long
+	var viewedBodies : TreeMap<EnvironmentBody, LinkedList<EnvironmentBody>>
 
 	new (width : float, height : float) {
 		this.world = new World()
@@ -58,6 +70,52 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 		this.world.settings.stepFrequency = 1.0f/60.0f
 		this.world.setBounds(new AxisAlignedBounds(width, height))
 		lastNanoTime = System.nanoTime()
+		viewedBodies = new TreeMap<EnvironmentBody, LinkedList<EnvironmentBody>>
+		this.world.addListener(new StepAdapter() {
+			//  At the beginning of a step, we clear the list of view bodies
+			override begin(step : Step, world : World) {
+				viewedBodies.clear	
+			}
+		})
+		this.world.addListener(new ContactAdapter() {
+			/* When the frustrum of an object intersect with an other object,
+			 it is added to the perceptions list */
+			override sensed(point : ContactPoint) {
+				var seer : EnvironmentBody
+				var seen : EnvironmentBody
+				// We consider only bodies defined as EnvironmentBody
+				if (EnvironmentBody.isInstance(point.body1) &&
+					 EnvironmentBody.isInstance(point.body2)) {
+
+					// Checking which fixture is a frustrum
+					if (point.fixture1.userData == ShapeType.FRUSTRUM) {
+					// We don't want frustrums to see other frustrums
+						if (point.fixture2.sensor) {
+							return
+						}
+						seer = point.body1 as EnvironmentBody
+						seen = point.body2 as EnvironmentBody
+					} else if (point.fixture2.userData == ShapeType.FRUSTRUM) {
+						if (point.fixture1.sensor) {
+							return
+						}
+						seer = point.body2 as EnvironmentBody
+						seen = point.body1 as EnvironmentBody
+					} else {
+						return
+					}
+				
+				// checking if the body already perceived an other body and adding the new one
+					var bodyList = viewedBodies.get(seer)
+					if (bodyList === null) {
+						bodyList = new LinkedList<EnvironmentBody>()
+						viewedBodies.put(seer, bodyList)
+					}
+					bodyList.add(seen)
+						
+				}
+			}
+		})
 	}
 	
 	/** 
@@ -157,7 +215,30 @@ skill DefaultEnvironmentManager implements EnvironmentManager {
 	def getVisualPerceptions(agentBody : AgentBody) : List<EnvironmentBody> {
 		val perceivedObjects = new LinkedList<EnvironmentBody>
 
-		// TODO compute visual perceptions for the body
+		var seens = viewedBodies.get(agentBody)
+		if (seens !== null) {
+			var seens2 = new HashSet(seens).sortBy[it.position.distance(agentBody.position)]
+//			val gjk = new Gjk()
+//			var toRemove = new LinkedList<EnvironmentBody>
+//			for (testedBody : seens2) {
+//				val ray = new Ray(agentBody.position, agentBody.position.difference(testedBody.position).normalize)
+//				for (otherBody : seens2) {
+//					if (testedBody != otherBody) {
+//						if(gjk.raycast(
+//								ray, 
+//								agentBody.position.distance(testedBody.position),
+//								otherBody.fixtures.findFirst[!it.sensor].shape,
+//								otherBody.transform,
+//								new Raycast())) {
+//							toRemove.add(testedBody)
+//							break
+//						}
+//					}
+//				}
+//			}
+//			seens2.removeAll(toRemove)
+			perceivedObjects.addAll(seens2)				
+		}
 		
 		return perceivedObjects
 	}

@@ -37,6 +37,7 @@ import fr.utbm.info.ia51.crowdproject.motion.SteeringSeekAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.FleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.KinematicFleeAlgorithm
 import fr.utbm.info.ia51.crowdproject.motion.SteeringFleeAlgorithm
+import fr.utbm.info.ia51.crowdproject.environment.HamsterBody
 import fr.utbm.info.ia51.crowdproject.motion.CryType
 
 /**
@@ -72,14 +73,15 @@ agent Hamster extends Animat {
 	
 	on Perception [it.agentId == this.agentId] {
 		synchronized(this) {
+			var firstSeen = occurrence.objects.findFirst[HamsterBody.isInstance(it)]
 			var computedMotion : ActionQuery
 			
 			// If the target has been perceived
-			if (occurrence.agentBody.position.to(0.0, 0.0).magnitude < 100.0f) {
+			if (firstSeen !== null) {
 				computedMotion = this.seekBehavior.run(
 				occurrence.agentId,
 				occurrence.agentBody.orientation,
-				occurrence.agentBody.position.to(0.0, 0.0),
+				occurrence.agentBody.position.to(firstSeen.position),
 				occurrence.agentBody.maxLinear,
 				occurrence.agentBody.maxAngular
 				)
