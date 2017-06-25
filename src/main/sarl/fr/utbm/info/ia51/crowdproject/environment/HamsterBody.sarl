@@ -36,7 +36,7 @@ class HamsterBody extends AgentBody {
 	val MAX_LINEAR_VELOCITY = 100.0f
 	val MAX_LINEAR_ACCELERATION = 10000.0f
 	val MAX_ANGULAR_VELOCITY = 30.0f
-	val MAX_ANGULAR_ACCELERATION = 1000.0f
+	val MAX_ANGULAR_ACCELERATION = 90.0f
 	
 	new (shape : Convex,
 		frustrum : Convex,

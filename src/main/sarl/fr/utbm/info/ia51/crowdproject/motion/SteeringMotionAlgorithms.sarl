@@ -37,8 +37,8 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 	override run(
 		emitter : UUID,
 		orientation : double,
-		actualSpeed : Vector2,
-		actualRotation : double,
+		actualLinearVelocity : Vector2,
+		actualangularVelocity : double,
 		maxLinearVelocity : float,
 		maxAngularVelocity : float,
 		maxLinearAcceleration : float,
@@ -50,13 +50,21 @@ class SteeringWanderAlgorithm implements WanderAlgorithm {
 		
 		// Calculate the displacement and its angle
 		var displacement = Vector2.create(WANDER_CIRCLE_RADIUS, orientation)
-		var angle = ((Math.random - Math.random) * Math.PI) as float
+		var angle = ((Math.random - Math.random) * Math.PI*maxAngularAcceleration) as float
+		if ((actualangularVelocity < 0 && angle < 0 && actualangularVelocity < -maxAngularVelocity) ||
+			actualangularVelocity > 0 && angle > 0 && actualangularVelocity > maxAngularVelocity) {
+			angle = -angle;
+		}
+		
 		displacement.rotate(angle)
 		
 		// Calculate the wandering force and change the speed
 		var linearVector = center.add(displacement)
-		linearVector.magnitude = maxLinearAcceleration / 2.0f
+		linearVector.magnitude = maxLinearAcceleration		
 
+		if (actualLinearVelocity.magnitude >= maxLinearVelocity) {
+			linearVector = linearVector.difference(actualLinearVelocity)
+		} 
 		return new ActionQuery(emitter, MotionBehavior::STEERING, linearVector, angle)
 	}
 }
@@ -70,8 +78,8 @@ class SteeringSeekAlgorithm implements SeekAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetRelativePosition : Vector2,
-		actualSpeed : Vector2,
-		actualRotation : double,
+		actualLinearVelocity : Vector2,
+		actualangularVelocity : double,
 		maxLinearVelocity : float,
 		maxAngularVelocity : float,
 		maxLinearAcceleration : float,
@@ -106,8 +114,8 @@ class SteeringFleeAlgorithm implements FleeAlgorithm {
 		emitter : UUID,
 		orientation : double,
 		targetRelativePosition : Vector2,
-		actualSpeed : Vector2,
-		actualRotation : double,
+		actualLinearVelocity : Vector2,
+		actualangularVelocity : double,
 		maxLinearVelocity : float,
 		maxAngularVelocity : float,
 		maxLinearAcceleration : float,
